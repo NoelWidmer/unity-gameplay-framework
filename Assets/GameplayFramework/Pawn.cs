@@ -50,5 +50,33 @@ namespace GameplayFramework
             _controller = null;
             BecameUnPossessed.SafeInvoke(this, EventArgs.Empty);
         }
+
+
+
+        protected virtual void TriggeredByUpdateSomehow(float deltaTime)
+        {
+            Controller controller = _controller;
+            if(controller != null && controller is PlayerController)
+            {
+                PlayerController playerController = (PlayerController)controller;
+
+                playerController.PlayerInput.Tick(deltaTime);
+                playerController.Tick(deltaTime);
+            }
+        }
+
+
+
+        protected virtual void TriggeredByLateUpdateSomehow(float deltaTime)
+        {
+            Controller controller = _controller;
+            if(controller != null && controller is PlayerController)
+            {
+                PlayerController playerController = (PlayerController)controller;
+
+                playerController.PlayerCamera.Tick(deltaTime);
+                playerController.PlayerHUD.Tick(deltaTime);
+            }
+        }
     }
 }

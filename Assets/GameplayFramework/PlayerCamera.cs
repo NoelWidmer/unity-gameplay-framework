@@ -6,5 +6,9 @@ namespace GameplayFramework
 {
     public class PlayerCamera
     {
+        public virtual void Tick(float deltaTime)
+        {
+
+        }
     }
 }

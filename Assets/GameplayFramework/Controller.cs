@@ -49,5 +49,12 @@ namespace GameplayFramework
             pawn.OnBecameUnPossessed();
             UnPossessedPawn.SafeInvoke(this, EventArgs.Empty);
         }
+
+
+
+        public virtual void Tick(float deltaTime)
+        {
+
+        }
     }
 }

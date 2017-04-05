@@ -4,7 +4,11 @@ using UnityEngine;
 
 namespace GameplayFramework
 {
-    public class PlayerHUD : MonoBehaviour
+    public class PlayerHUD
     {
+        public virtual void Tick(float deltaTime)
+        {
+
+        }
     }
 }
