@@ -15,8 +15,8 @@ public abstract class Controller
 
 
 
-    public event EventHandler PossessedPawn;
-    public event EventHandler UnPossessedPawn;
+    public event EventHandler<EventArgs> PossessedPawn;
+    public event EventHandler<EventArgs> UnPossessedPawn;
 
 
 
@@ -29,10 +29,7 @@ public abstract class Controller
             UnPossess();
 
         _pawn = pawn;
-
-        EventHandler subscribers = PossessedPawn;
-        if(subscribers != null)
-            subscribers(this, EventArgs.Empty);
+        PossessedPawn.SafeInvoke(this, EventArgs.Empty);
     }
 
 
@@ -43,9 +40,6 @@ public abstract class Controller
             return;
         
         _pawn = null;
-
-        EventHandler subscribers = UnPossessedPawn;
-        if(subscribers != null)
-            subscribers(this, EventArgs.Empty);
+        UnPossessedPawn.SafeInvoke(this, EventArgs.Empty);
     }
 }

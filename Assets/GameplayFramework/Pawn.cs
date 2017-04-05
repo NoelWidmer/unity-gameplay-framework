@@ -17,8 +17,8 @@ public class Pawn
 
 
 
-    public event EventHandler BecamePossessed;
-    public event EventHandler BecameUnPossessed;
+    public event EventHandler<EventArgs> BecamePossessed;
+    public event EventHandler<EventArgs> BecameUnPossessed;
 
 
 
@@ -36,10 +36,7 @@ public class Pawn
         }
 
         _controller = controller;
-
-        EventHandler subscribers = BecamePossessed;
-        if(subscribers != null)
-            subscribers(this, EventArgs.Empty);
+        BecamePossessed.SafeInvoke(this, EventArgs.Empty);
     }
 
 
@@ -49,9 +46,6 @@ public class Pawn
             return;
 
         _controller = null;
-
-        EventHandler subscribers = BecameUnPossessed;
-        if(subscribers != null)
-            subscribers(this, EventArgs.Empty);
+        BecameUnPossessed.SafeInvoke(this, EventArgs.Empty);
     }
 }
