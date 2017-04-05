@@ -7,6 +7,7 @@ namespace GameplayFramework
 {
     public class Pawn
     {
+        private readonly object _lock = new object();
         private Controller _controller;
 
         public Controller Controller
@@ -29,26 +30,32 @@ namespace GameplayFramework
             if(controller == null)
                 throw new ArgumentNullException();
 
-            if(_controller != null)
+            lock(_lock)
             {
-                if(_controller.GetHashCode() == controller.GetHashCode())
-                    return;
+                if(_controller != null)
+                {
+                    if(_controller.GetHashCode() == controller.GetHashCode())
+                        return;
 
-                _controller.UnPossess();
+                    _controller.UnPossess();
+                }
+
+                _controller = controller;
+                BecamePossessed.SafeInvoke(this, EventArgs.Empty);
             }
-
-            _controller = controller;
-            BecamePossessed.SafeInvoke(this, EventArgs.Empty);
         }
 
 
         public void OnBecameUnPossessed()
         {
-            if(_controller == null)
-                return;
+            lock(_lock)
+            {
+                if(_controller == null)
+                    return;
 
-            _controller = null;
-            BecameUnPossessed.SafeInvoke(this, EventArgs.Empty);
+                _controller = null;
+                BecameUnPossessed.SafeInvoke(this, EventArgs.Empty);
+            }
         }
 
 

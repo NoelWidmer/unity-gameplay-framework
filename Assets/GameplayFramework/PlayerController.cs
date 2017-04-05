@@ -7,7 +7,7 @@ namespace GameplayFramework
 {
     public class PlayerController : Controller
     {
-        private bool _initialized = false;
+        private bool _playerComponentsInstantiated;
 
         private PlayerInput _playerInput;
         private PlayerCamera _playerCamera;
@@ -17,7 +17,10 @@ namespace GameplayFramework
 
         public PlayerController()
         {
-            CallInitialize();
+            Initialize();
+
+            if(_playerComponentsInstantiated == false)
+                throw new InvalidOperationException();
         }
 
 
@@ -48,26 +51,34 @@ namespace GameplayFramework
 
 
 
-        protected virtual void CallInitialize()
+        protected virtual void Initialize()
         {
-            Initialize<PlayerInput, PlayerCamera, PlayerHUD>();
+            InstantiatePlayerComponents<PlayerInput, PlayerCamera, PlayerHUD>();
+            Game.RequestJoin(this, JoinRequestResponse);
         }
 
 
 
-        protected void Initialize<TPlayerInput, TPlayerCamera, TPlayerHUD>() 
+        protected void InstantiatePlayerComponents<TPlayerInput, TPlayerCamera, TPlayerHUD>() 
             where TPlayerInput : PlayerInput, new()
             where TPlayerCamera : PlayerCamera, new()
             where TPlayerHUD : PlayerHUD, new()
         {
-            if(_initialized)
+            if(_playerComponentsInstantiated)
                 throw new InvalidOperationException();
 
             _playerInput = new TPlayerInput();
             _playerCamera = new TPlayerCamera();
             _playerHUD = new TPlayerHUD();
 
-            _initialized = true;
+            _playerComponentsInstantiated = true;
+        }
+
+
+
+        protected virtual void JoinRequestResponse()
+        {
+
         }
     }
 }

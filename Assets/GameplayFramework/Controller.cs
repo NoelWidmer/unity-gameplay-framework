@@ -5,6 +5,7 @@ namespace GameplayFramework
 {
     public abstract class Controller
     {
+        private readonly object _lock = new object();
         private Pawn _pawn;
 
         public Pawn Pawn
@@ -22,32 +23,38 @@ namespace GameplayFramework
 
 
 
-        public virtual void Possess(Pawn pawn)
+        public void Possess(Pawn pawn)
         {
             if(pawn == null)
                 throw new ArgumentNullException();
 
-            if(_pawn != null)
-                UnPossess();
+            lock(_lock)
+            {
+                if(_pawn != null)
+                    UnPossess();
 
-            _pawn = pawn;
+                _pawn = pawn;
 
-            pawn.OnBecamePossessed(this);
-            PossessedPawn.SafeInvoke(this, EventArgs.Empty);
+                pawn.OnBecamePossessed(this);
+                PossessedPawn.SafeInvoke(this, EventArgs.Empty);
+            }
         }
 
 
 
-        public virtual void UnPossess()
+        public void UnPossess()
         {
-            if(_pawn == null)
-                return;
+            lock(_lock)
+            {
+                if(_pawn == null)
+                    return;
 
-            Pawn pawn = _pawn;
-            _pawn = null;
+                Pawn pawn = _pawn;
+                _pawn = null;
 
-            pawn.OnBecameUnPossessed();
-            UnPossessedPawn.SafeInvoke(this, EventArgs.Empty);
+                pawn.OnBecameUnPossessed();
+                UnPossessedPawn.SafeInvoke(this, EventArgs.Empty);
+            }
         }
 
 
