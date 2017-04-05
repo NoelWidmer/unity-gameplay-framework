@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : Controller
+namespace GameplayFramework
 {
+    public class PlayerController : Controller
+    {
+    }
 }

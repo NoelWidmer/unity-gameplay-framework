@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AIController : Controller
+namespace GameplayFramework
 {
+    public class AIController : Controller
+    {
+    }
 }

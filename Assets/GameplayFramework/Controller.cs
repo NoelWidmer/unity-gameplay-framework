@@ -1,45 +1,48 @@
 ﻿using System;
 using UnityEngine;
 
-public abstract class Controller
+namespace GameplayFramework
 {
-    private Pawn _pawn;
-
-    public Pawn Pawn
+    public abstract class Controller
     {
-        get
+        private Pawn _pawn;
+
+        public Pawn Pawn
         {
-            return _pawn;
+            get
+            {
+                return _pawn;
+            }
         }
-    }
 
 
 
-    public event EventHandler<EventArgs> PossessedPawn;
-    public event EventHandler<EventArgs> UnPossessedPawn;
+        public event EventHandler<EventArgs> PossessedPawn;
+        public event EventHandler<EventArgs> UnPossessedPawn;
 
 
 
-    public virtual void Possess(Pawn pawn)
-    {
-        if(pawn == null)
-            throw new ArgumentNullException();
+        public virtual void Possess(Pawn pawn)
+        {
+            if(pawn == null)
+                throw new ArgumentNullException();
 
-        if(_pawn != null)
-            UnPossess();
+            if(_pawn != null)
+                UnPossess();
 
-        _pawn = pawn;
-        PossessedPawn.SafeInvoke(this, EventArgs.Empty);
-    }
+            _pawn = pawn;
+            PossessedPawn.SafeInvoke(this, EventArgs.Empty);
+        }
 
 
 
-    public virtual void UnPossess()
-    {
-        if(_pawn == null)
-            return;
-        
-        _pawn = null;
-        UnPossessedPawn.SafeInvoke(this, EventArgs.Empty);
+        public virtual void UnPossess()
+        {
+            if(_pawn == null)
+                return;
+
+            _pawn = null;
+            UnPossessedPawn.SafeInvoke(this, EventArgs.Empty);
+        }
     }
 }

@@ -3,49 +3,52 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pawn
+namespace GameplayFramework
 {
-    private Controller _controller;
-
-    public Controller Controller
+    public class Pawn
     {
-        get
+        private Controller _controller;
+
+        public Controller Controller
         {
-            return _controller;
+            get
+            {
+                return _controller;
+            }
         }
-    }
 
 
 
-    public event EventHandler<EventArgs> BecamePossessed;
-    public event EventHandler<EventArgs> BecameUnPossessed;
+        public event EventHandler<EventArgs> BecamePossessed;
+        public event EventHandler<EventArgs> BecameUnPossessed;
 
 
 
-    public void OnBecamePossessed(Controller controller)
-    {
-        if(controller == null)
-            throw new ArgumentNullException();
-
-        if(_controller != null)
+        public void OnBecamePossessed(Controller controller)
         {
-            if(_controller.GetHashCode() == controller.GetHashCode())
+            if(controller == null)
+                throw new ArgumentNullException();
+
+            if(_controller != null)
+            {
+                if(_controller.GetHashCode() == controller.GetHashCode())
+                    return;
+
+                _controller.UnPossess();
+            }
+
+            _controller = controller;
+            BecamePossessed.SafeInvoke(this, EventArgs.Empty);
+        }
+
+
+        public void OnBecameUnPossessed()
+        {
+            if(_controller == null)
                 return;
 
-            _controller.UnPossess();
+            _controller = null;
+            BecameUnPossessed.SafeInvoke(this, EventArgs.Empty);
         }
-
-        _controller = controller;
-        BecamePossessed.SafeInvoke(this, EventArgs.Empty);
-    }
-
-
-    public void OnBecameUnPossessed()
-    {
-        if(_controller == null)
-            return;
-
-        _controller = null;
-        BecameUnPossessed.SafeInvoke(this, EventArgs.Empty);
     }
 }
