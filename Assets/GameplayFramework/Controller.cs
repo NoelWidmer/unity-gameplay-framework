@@ -31,6 +31,8 @@ namespace GameplayFramework
                 UnPossess();
 
             _pawn = pawn;
+
+            pawn.OnBecamePossessed(this);
             PossessedPawn.SafeInvoke(this, EventArgs.Empty);
         }
 
@@ -41,7 +43,10 @@ namespace GameplayFramework
             if(_pawn == null)
                 return;
 
+            Pawn pawn = _pawn;
             _pawn = null;
+
+            pawn.OnBecameUnPossessed();
             UnPossessedPawn.SafeInvoke(this, EventArgs.Empty);
         }
     }
