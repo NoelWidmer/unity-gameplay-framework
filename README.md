@@ -1,2 +1,2 @@
 # UnityGameplayFramework
-A unity framework to simplify gameplay developement. 
+A framework to simplify Unity gameplay developement. 
