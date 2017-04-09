@@ -62,7 +62,7 @@ namespace GameplayFramework
             where TPlayerHUD : PlayerHUD, new()
         {
             if(_playerComponentsInstantiated)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("Player components have already been initialized.");
 
             _playerInput = new TPlayerInput();
             _playerCamera = new TPlayerCamera();
