@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameplayFramework
@@ -20,7 +18,7 @@ namespace GameplayFramework
             Initialize();
 
             if(_playerComponentsInstantiated == false)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("The player's components have not been set.");
         }
 
 
@@ -54,7 +52,6 @@ namespace GameplayFramework
         protected virtual void Initialize()
         {
             InstantiatePlayerComponents<PlayerInput, PlayerCamera, PlayerHUD>();
-            Game.RequestJoin(this, JoinRequestResponse);
         }
 
 
@@ -72,13 +69,6 @@ namespace GameplayFramework
             _playerHUD = new TPlayerHUD();
 
             _playerComponentsInstantiated = true;
-        }
-
-
-
-        protected virtual void JoinRequestResponse()
-        {
-
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameplayFramework
@@ -20,15 +18,15 @@ namespace GameplayFramework
 
 
 
-        public event EventHandler<EventArgs> BecamePossessed;
-        public event EventHandler<EventArgs> BecameUnPossessed;
+        public event EventHandler BecamePossessed;
+        public event EventHandler BecameUnPossessed;
 
 
 
         public void OnBecamePossessed(Controller controller)
         {
             if(controller == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("controller");
 
             lock(_lock)
             {
@@ -41,7 +39,10 @@ namespace GameplayFramework
                 }
 
                 _controller = controller;
-                BecamePossessed.SafeInvoke(this, EventArgs.Empty);
+
+                var becamePossessed = BecamePossessed;
+                if(becamePossessed != null)
+                    becamePossessed(this, EventArgs.Empty);
             }
         }
 
@@ -54,7 +55,10 @@ namespace GameplayFramework
                     return;
 
                 _controller = null;
-                BecameUnPossessed.SafeInvoke(this, EventArgs.Empty);
+
+                var becameUnossessed = BecameUnPossessed;
+                if(becameUnossessed != null)
+                    becameUnossessed(this, EventArgs.Empty);
             }
         }
 

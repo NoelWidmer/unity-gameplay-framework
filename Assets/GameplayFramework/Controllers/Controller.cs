@@ -18,8 +18,8 @@ namespace GameplayFramework
 
 
 
-        public event EventHandler<EventArgs> PossessedPawn;
-        public event EventHandler<EventArgs> UnPossessedPawn;
+        public event EventHandler PossessedPawn;
+        public event EventHandler UnPossessedPawn;
 
 
 
@@ -36,7 +36,10 @@ namespace GameplayFramework
                 _pawn = pawn;
 
                 pawn.OnBecamePossessed(this);
-                PossessedPawn.SafeInvoke(this, EventArgs.Empty);
+
+                var possessedPawn = PossessedPawn;
+                if(possessedPawn != null)
+                    possessedPawn(this, EventArgs.Empty);
             }
         }
 
@@ -53,7 +56,10 @@ namespace GameplayFramework
                 _pawn = null;
 
                 pawn.OnBecameUnPossessed();
-                UnPossessedPawn.SafeInvoke(this, EventArgs.Empty);
+
+                var unPossessedPawn = UnPossessedPawn;
+                if(unPossessedPawn != null)
+                    unPossessedPawn(this, EventArgs.Empty);
             }
         }
 
@@ -61,7 +67,6 @@ namespace GameplayFramework
 
         public virtual void Tick(float deltaTime)
         {
-
         }
     }
 }
