@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
-public class GameMode
+namespace GameplayFramework
 {
+    public class GameMode
+    {
+    }
 }

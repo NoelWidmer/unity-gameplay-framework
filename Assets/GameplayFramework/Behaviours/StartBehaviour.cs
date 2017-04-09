@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 
-public class StartBehaviour : MonoBehaviour
+namespace GameplayFramework
 {
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public class StartBehaviour : MonoBehaviour
+    {
+        private void Awake()
+        {
+            //Game.LoadMap(Map.Start);
+        }
+    }
 }

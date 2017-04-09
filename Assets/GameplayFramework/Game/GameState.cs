@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
-public class GameState
+namespace GameplayFramework
 {
+    public class GameState
+    {
+    }
 }
