@@ -4,12 +4,53 @@ using UnityEngine.SceneManagement;
 
 namespace GameplayFramework
 {
-    public static class Game
+    public class Game
     {
-        private static GameMode _gameMode;
-        private static GameState _gameState;
+        #region Singleton
 
-        public static GameMode GameMode
+        private static readonly object _instanceLock = new object();
+        private static Game _instance;
+
+        private Game()
+        {
+            lock(_instanceLock)
+            {
+                if(_instance != null)
+                    throw new InvalidOperationException("The Game has already been initialized.");
+
+                _instance = this;
+            }
+        }
+
+
+
+        public static Game Current
+        {
+            get
+            {
+                return _instance;
+            }
+        }
+
+
+
+        public static void Initialize(Anchor anchor)
+        {
+            if(anchor == null)
+                throw new ArgumentNullException("anchor");
+
+            _instance = new Game();
+            anchor.Tick += (sender, e) => _instance.Tick();
+        }
+
+        #endregion
+
+        #region GameMode and GameState
+
+        private GameMode _gameMode;
+        private GameState _gameState;
+
+        public GameMode GameMode
         {
             get
             {
@@ -17,7 +58,7 @@ namespace GameplayFramework
             }
         }
 
-        public static GameState GameState
+        public GameState GameState
         {
             get
             {
@@ -25,39 +66,21 @@ namespace GameplayFramework
             }
         }
 
+        #endregion
+
+        #region Scene loading
+
+        private readonly object _sceneLock = new object();
+
+        private AsyncOperation _sceneLoader;
 
 
-        #region Map loading
-
-        private static readonly object _sceneLock = new object();
-
-        private static AsyncOperation _sceneLoader;
-
-
-        public static event EventHandler PreLoadScene;
-        public static event EventHandler PostLoadScene;
-
-
-        public static bool IsLoadingScene
-        {
-            get
-            {
-                return _sceneLoader != null && _sceneLoader.isDone == false;
-            }
-        }
-
-        public static float? SceneLoadingProgress
-        {
-            get
-            {
-                AsyncOperation sceneLoader = _sceneLoader;
-                return sceneLoader == null ? default(float?) : sceneLoader.progress;
-            }
-        }
+        public event EventHandler PreLoadScene;
+        public event EventHandler PostLoadScene;
 
 
 
-        public static void LoadScene(SceneName scene)
+        public virtual void LoadScene(SceneName scene)
         {
             lock(_sceneLock)
             {
@@ -69,12 +92,12 @@ namespace GameplayFramework
                 var preLoadScene = PreLoadScene;
                 if(preLoadScene != null)
                     preLoadScene(null, EventArgs.Empty);
-
+                
                 _sceneLoader = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
             }
         }
 
-        public static void Tick(float deltaTime)
+        public virtual void Tick()
         {
             AsyncOperation sceneLoader = _sceneLoader;
 
