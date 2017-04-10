@@ -114,17 +114,11 @@ namespace GameplayFramework.Internal
         private static void RebuildGameModeEnum(string assetDirectory)
         {
             string gameModeDirectory = Path.Combine(assetDirectory, "GameModes");
-            string enumFileContent;
+            var filenames = new List<string> { typeof(GameMode).Name };
 
             // Assume that there are no GameModes if the directory doesn't exist.
-            if(Directory.Exists(gameModeDirectory) == false)
+            if(Directory.Exists(gameModeDirectory))
             {
-                enumFileContent = string.Empty;
-            }
-            else
-            {
-                var filenames = new List<string>();
-
                 // Get all files in the GameMode directory.
                 foreach(var fullFilePath in Directory.GetFiles(gameModeDirectory))
                 {
@@ -133,18 +127,11 @@ namespace GameplayFramework.Internal
 
                     filenames.Add(Path.GetFileNameWithoutExtension(fullFilePath));
                 }
-
-                // Build the contents of the enum file.
-                if(filenames.Count == 0)
-                {
-                    enumFileContent = string.Format(_gameModeNamesEnumTemplate, "");
-                }
-                else
-                {
-                    string enumMembers = string.Join(",\n\t\t", filenames.ToArray());
-                    enumFileContent = string.Format(_gameModeNamesEnumTemplate, enumMembers);
-                }
             }
+
+            // Build the contents of the enum file.
+            string enumMembers = string.Join(",\n\t\t", filenames.ToArray());
+            string enumFileContent = string.Format(_gameModeNamesEnumTemplate, enumMembers);
 
             // Make sure the enum file exists.
             string fullEnumFilePath = Path.Combine(assetDirectory, _gameModeNamesEnumRelativeFilePath);

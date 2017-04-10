@@ -66,6 +66,14 @@ namespace GameplayFramework
             }
         }
 
+
+
+        public void SetGameMode(GameModeName gameMode)
+        {
+            string gameModeName = Enum.GetName(typeof(GameModeName), gameMode);
+            Debug.Log("Setting GameMode: " + gameModeName);
+        }
+
         #endregion
 
         #region Scene loading

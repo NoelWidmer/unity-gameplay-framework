@@ -7,11 +7,24 @@ namespace GameplayFramework
         [SerializeField]
         private SceneName _startScene;
 
+        [SerializeField]
+        private GameModeName _startGameMode;
+
+
+
         public SceneName StartScene
         {
             get
             {
                 return _startScene;
+            }
+        }
+
+        public GameModeName StartGameMode
+        {
+            get
+            {
+                return _startGameMode;
             }
         }
 
@@ -65,7 +78,7 @@ namespace GameplayFramework
 
         protected virtual void StartScenePreLoad()
         {
-            //TODO initialize first mode
+            Game.Current.SetGameMode(GameModeName.GameMode);
             Debug.Log("StartScenePreLoad");
         }
 
