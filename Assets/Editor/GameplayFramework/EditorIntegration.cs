@@ -5,7 +5,7 @@ using Boo.Lang;
 using UnityEditor;
 using UnityEngine;
 
-namespace GameplayFramework.Internal
+namespace GameplayFramework.Editor
 {
     public class EditorIntegration : EditorWindow
     {
@@ -48,7 +48,7 @@ namespace GameplayFramework.Internal
             string assetDirectory = Application.dataPath;
 
             if(assetDirectory.EndsWith(_assetDirectoryName) == false)
-                throw new InvalidOperationException("Maps can only be rebuilt from within the editor.");
+                throw new InvalidOperationException("The GameplayFramework can only be rebuilt from within the editor.");
 
             // Call all partial rebuilds.
             RebuildSceneEnum(assetDirectory);
@@ -67,46 +67,48 @@ namespace GameplayFramework.Internal
             if(scenes == null || scenes.Length == 0)
             {
                 Debug.LogWarning("No scenes have been added to the build settings. The GameplayFramework cannot correctly rebuild.");
+                return;
+            }
+
+            List<string> sceneNames = new List<string>();
+
+            // Get all scenes to add to the enum.
+            foreach(var scene in scenes)
+            {
+                string sceneName = Path.GetFileNameWithoutExtension(scene.path);
+
+                if(_sceneNamesToIgnore.Contains(sceneName))
+                    continue;
+
+                if(sceneNames.Contains(sceneName))
+                    throw new InvalidOperationException("Could not rebuild the scenes because there are multiple scenes with the same name (" + sceneName + ").");
+
+                sceneNames.Add(sceneName);
+            }
+
+            string memberContent;
+
+            // Build the contents of the enum file.
+            if(sceneNames.Count == 0)
+            {
+                memberContent = string.Empty;
             }
             else
             {
-                List<string> sceneNames = new List<string>();
-
-                // Get all scenes to add to the enum.
-                foreach(var scene in scenes)
-                {
-                    string sceneName = Path.GetFileNameWithoutExtension(scene.path);
-
-                    if(_sceneNamesToIgnore.Contains(sceneName))
-                        continue;
-
-                    sceneNames.Add(sceneName);
-                }
-
-                string enumFileContent;
-
-                // Build the contents of the enum file.
-                if(sceneNames.Count == 0)
-                {
-                    enumFileContent = string.Format(_sceneNamesEnumTemplate, "");
-                }
-                else
-                {
-                    string enumMembers = string.Join(",\n\t\t", sceneNames.ToArray());
-                    enumFileContent = string.Format(_sceneNamesEnumTemplate, enumMembers);
-                }
-
-                // Make sure the enum file exists.
-                string fullEnumFilePath = Path.Combine(assetDirectory, _sceneNamesEnumRelativeFilePath);
-
-                if(File.Exists(fullEnumFilePath) == false)
-                    throw new InvalidOperationException("The following file could not be found: " + fullEnumFilePath);
-
-                // Write contents.
-                File.WriteAllText(fullEnumFilePath, enumFileContent);
-
-                Log("If you are missing entries in the 'SceneName' enum, make sure to add the missing scenes to the build settings.");
+                memberContent = string.Join(",\n\t\t", sceneNames.ToArray());
             }
+
+            // Make sure the enum file exists.
+            string fullEnumFilePath = Path.Combine(assetDirectory, _sceneNamesEnumRelativeFilePath);
+
+            if(File.Exists(fullEnumFilePath) == false)
+                throw new InvalidOperationException("The following file could not be found: " + fullEnumFilePath);
+
+            // Write contents.
+            string content = string.Format(_sceneNamesEnumTemplate, memberContent);
+            File.WriteAllText(fullEnumFilePath, content);
+
+            Log("If you are missing entries in the 'SceneName' enum, make sure to add the missing scenes to the build settings.");
         }
 
 

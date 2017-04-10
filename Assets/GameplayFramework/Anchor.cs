@@ -1,14 +1,17 @@
 ﻿using System;
 using UnityEngine;
 
-public class Anchor : MonoBehaviour
+namespace GameplayFramework
 {
-    public event EventHandler Tick;
-
-    protected virtual void Update()
+    public class Anchor : MonoBehaviour
     {
-        var tick = Tick;
-        if(tick != null)
-            tick(this, EventArgs.Empty);
+        public event EventHandler Tick;
+
+        protected virtual void Update()
+        {
+            var tick = Tick;
+            if(tick != null)
+                tick(this, EventArgs.Empty);
+        }
     }
 }
