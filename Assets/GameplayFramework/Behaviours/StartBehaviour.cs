@@ -1,24 +1,25 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace GameplayFramework
 {
     public class StartBehaviour : MonoBehaviour
     {
         [SerializeField]
-        private Map _startMap;
+        private SceneName _startScene;
 
-        public Map StartMap
+        public SceneName StartScene
         {
             get
             {
-                return _startMap;
+                return _startScene;
             }
         }
 
-        private void Awake()
+
+
+        protected virtual void Awake()
         {
-            Game.LoadMap(StartMap);
+            Game.LoadScene(StartScene);
         }
     }
 }

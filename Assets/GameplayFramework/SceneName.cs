@@ -1,6 +1,6 @@
 namespace GameplayFramework
 {
-	public enum Map
+	public enum SceneName
 	{
 		First
 	}

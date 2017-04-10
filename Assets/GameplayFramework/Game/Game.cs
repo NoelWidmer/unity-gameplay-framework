@@ -29,64 +29,64 @@ namespace GameplayFramework
 
         #region Map loading
 
-        private static readonly object _mapLock = new object();
+        private static readonly object _sceneLock = new object();
 
-        private static AsyncOperation _mapLoader;
-
-
-        public static event EventHandler PreLoadMap;
-        public static event EventHandler PostLoadMap;
+        private static AsyncOperation _sceneLoader;
 
 
-        public static bool IsLoadingMap
+        public static event EventHandler PreLoadScene;
+        public static event EventHandler PostLoadScene;
+
+
+        public static bool IsLoadingScene
         {
             get
             {
-                return _mapLoader != null && _mapLoader.isDone == false;
+                return _sceneLoader != null && _sceneLoader.isDone == false;
             }
         }
 
-        public static float? MapLoadingProgress
+        public static float? SceneLoadingProgress
         {
             get
             {
-                AsyncOperation mapLoader = _mapLoader;
-                return mapLoader == null ? default(float?) : mapLoader.progress;
+                AsyncOperation sceneLoader = _sceneLoader;
+                return sceneLoader == null ? default(float?) : sceneLoader.progress;
             }
         }
 
 
 
-        public static void LoadMap(Map map)
+        public static void LoadScene(SceneName scene)
         {
-            lock(_mapLock)
+            lock(_sceneLock)
             {
-                if(_mapLoader != null)
-                    throw new InvalidOperationException("Only a single map can be loaded at a time.");
+                if(_sceneLoader != null)
+                    throw new InvalidOperationException("Only a single scene can be loaded at a time.");
 
-                string sceneName = Enum.GetName(typeof(Map), map);
+                string sceneName = Enum.GetName(typeof(SceneName), scene);
 
-                var preLoadMap = PreLoadMap;
-                if(preLoadMap != null)
-                    preLoadMap(null, EventArgs.Empty);
+                var preLoadScene = PreLoadScene;
+                if(preLoadScene != null)
+                    preLoadScene(null, EventArgs.Empty);
 
-                _mapLoader = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+                _sceneLoader = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
             }
         }
 
         public static void Tick(float deltaTime)
         {
-            AsyncOperation mapLoader = _mapLoader;
+            AsyncOperation sceneLoader = _sceneLoader;
 
-            if(mapLoader != null && mapLoader.isDone)
+            if(sceneLoader != null && sceneLoader.isDone)
             {
-                lock(_mapLock)
+                lock(_sceneLock)
                 {
-                    _mapLoader = null;
+                    _sceneLoader = null;
 
-                    var postLoadMap = PostLoadMap;
-                    if(postLoadMap != null)
-                        postLoadMap(null, EventArgs.Empty);
+                    var postLoadScene = PostLoadScene;
+                    if(postLoadScene != null)
+                        postLoadScene(null, EventArgs.Empty);
                 }
             }
         }

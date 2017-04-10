@@ -11,10 +11,10 @@ namespace GameplayFramework.Internal
     {
         private static readonly string[] _buildSceneNamesToIgnore = new [] { "Start" };
         private static readonly string _assetDirectoryName = "Assets";
-        private static readonly string _mapEnumTemplate = 
+        private static readonly string _scenesEnumTemplate = 
             "namespace GameplayFramework" + "\n" + 
-            "{{" + "\n\t" + 
-            "public enum Map" + "\n\t" + 
+            "{{" + "\n\t" +
+            "public enum SceneName" + "\n\t" + 
             "{{" + "\n\t\t" + 
             "{0}" + "\n\t" + 
             "}}" + "\n" + 
@@ -64,16 +64,16 @@ namespace GameplayFramework.Internal
                 // Build the contents of the enum file.
                 if(buildSceneNames.Count == 0)
                 {
-                    enumFileContent = string.Format(_mapEnumTemplate, "");
+                    enumFileContent = string.Format(_scenesEnumTemplate, "");
                 }
                 else
                 {
                     string enumMembers = string.Join(",\n\t\t", buildSceneNames.ToArray());
-                    enumFileContent = string.Format(_mapEnumTemplate, enumMembers);
+                    enumFileContent = string.Format(_scenesEnumTemplate, enumMembers);
                 }
 
                 // Get the path of the enum file.
-                string fullEnumFilePath = Path.Combine(dataPath, "GameplayFramework" + Path.DirectorySeparatorChar + "Map.cs");
+                string fullEnumFilePath = Path.Combine(dataPath, "GameplayFramework" + Path.DirectorySeparatorChar + "SceneName.cs");
 
                 if(File.Exists(fullEnumFilePath) == false)
                     throw new InvalidOperationException("The following file could not be found: " + fullEnumFilePath);
@@ -81,7 +81,7 @@ namespace GameplayFramework.Internal
                 // Write contents.
                 File.WriteAllText(fullEnumFilePath, enumFileContent);
 
-                Debug.Log("The GameplayFramework has rebuilt. If you are missing entries in the Maps enum, make sure to add those maps to the build settings.");
+                Debug.Log("The GameplayFramework has rebuilt. If you are missing entries in the 'SceneName' enum, make shure to add the missing scenes to the build settings.");
             }
         }
     }
