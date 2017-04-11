@@ -12,6 +12,7 @@ namespace GameplayFramework
         #region Singleton
 
         private static readonly object _instanceLock = new object();
+        private static Anchor _anchor;
         private static Game _instance;
 
         private Game()
@@ -42,7 +43,9 @@ namespace GameplayFramework
             if(anchor == null)
                 throw new ArgumentNullException("anchor");
 
-            _instance = new Game();
+            _anchor = anchor;
+
+            new Game();
             anchor.Tick += (sender, e) => _instance.Tick();
         }
 
@@ -74,7 +77,6 @@ namespace GameplayFramework
         public void SetGameMode(GameModeName gameMode)
         {
             string gameModeName = Enum.GetName(typeof(GameModeName), gameMode);
-            Debug.Log("Setting GameMode: " + gameModeName);
 
             Type type;
 
@@ -112,7 +114,7 @@ namespace GameplayFramework
             // Make sure the instance is a game mode.
             if(instance is GameMode)
             {
-                _gameMode = (GameMode)instance;
+                SetGameMode((GameMode)instance);
             }
             else
             {
@@ -124,8 +126,22 @@ namespace GameplayFramework
 
         public void SetGameMode<T>() where T : GameMode, new()
         {
-            Debug.Log("Setting GameMode: " + typeof(T).Name);
-            _gameMode = new T();
+            SetGameMode(new T());
+        }
+
+
+
+        private void SetGameMode(GameMode mode)
+        {
+            GameMode oldMode = _gameMode;
+
+            _gameMode = mode;
+            _gameMode.Initialize(_anchor);
+
+            if(oldMode != null)
+                oldMode.EndMode();
+
+            _gameMode.BeginMode();
         }
 
         #endregion
