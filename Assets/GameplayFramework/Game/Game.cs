@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -72,6 +75,57 @@ namespace GameplayFramework
         {
             string gameModeName = Enum.GetName(typeof(GameModeName), gameMode);
             Debug.Log("Setting GameMode: " + gameModeName);
+
+            Type type;
+
+            // Get the type of game mode.
+            {
+                Type[] types = Assembly.GetExecutingAssembly().GetTypes();
+                List<Type> matchingTypes = types.Where(t => t.Name == gameModeName).ToList();
+
+                if(matchingTypes.Count() == 1)
+                {
+                    type = matchingTypes[0];
+                }
+                else if(matchingTypes.Count() == 0)
+                {
+                    throw new InvalidOperationException("Couldn't find a type with name '" + gameModeName + "'.");
+                }
+                else
+                {
+                    throw new InvalidOperationException("Found multiple types with name '" + gameModeName + "'.");
+                }
+            }
+
+            object instance;
+
+            // Create an instance of the game mode.
+            try
+            {
+                instance = Activator.CreateInstance(type);
+            }
+            catch(Exception ex)
+            {
+                throw new InvalidOperationException("Couldn't create an instance of the type with name '" + gameModeName + "'.", ex);
+            }
+
+            // Make sure the instance is a game mode.
+            if(instance is GameMode)
+            {
+                _gameMode = (GameMode)instance;
+            }
+            else
+            {
+                throw new InvalidOperationException("The type with name '" + gameModeName + "' is not a '" + typeof(GameMode).Name + "'.");
+            }
+        }
+
+
+
+        public void SetGameMode<T>() where T : GameMode, new()
+        {
+            Debug.Log("Setting GameMode: " + typeof(T).Name);
+            _gameMode = new T();
         }
 
         #endregion
