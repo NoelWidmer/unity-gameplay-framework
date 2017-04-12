@@ -15,13 +15,14 @@ namespace GameplayFramework
         private static Anchor _anchor;
         private static Game _instance;
 
-        private Game()
+        private Game(Anchor anchor)
         {
             lock(_instanceLock)
             {
                 if(_instance != null)
                     throw new InvalidOperationException("The Game has already been initialized.");
 
+                _anchor = anchor;
                 _instance = this;
             }
         }
@@ -43,10 +44,8 @@ namespace GameplayFramework
             if(anchor == null)
                 throw new ArgumentNullException("anchor");
 
-            _anchor = anchor;
-
-            new Game();
-            anchor.Tick += (sender, e) => _instance.Tick();
+            new Game(anchor);
+            anchor.TickLast += (sender, e) => _instance.Tick();
         }
 
         #endregion
@@ -83,11 +82,11 @@ namespace GameplayFramework
             // Get the type of game mode.
             {
                 Type[] types = Assembly.GetExecutingAssembly().GetTypes();
-                List<Type> matchingTypes = types.Where(t => t.Name == gameModeName).ToList();
+                IEnumerable<Type> matchingTypes = types.Where(t => t.Name == gameModeName);
 
                 if(matchingTypes.Count() == 1)
                 {
-                    type = matchingTypes[0];
+                    type = matchingTypes.First();
                 }
                 else if(matchingTypes.Count() == 0)
                 {
