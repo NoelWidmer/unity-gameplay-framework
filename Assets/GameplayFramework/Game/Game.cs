@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 namespace GameplayFramework
 {
-    public class Game
+    public sealed class Game
     {
         #region Singleton
 
@@ -50,24 +50,16 @@ namespace GameplayFramework
 
         #endregion
 
-        #region GameMode and GameState
+        #region GameMode
 
+        private readonly object _gameModeLock = new object();
         private GameMode _gameMode;
-        private GameState _gameState;
 
         public GameMode GameMode
         {
             get
             {
                 return _gameMode;
-            }
-        }
-
-        public GameState GameState
-        {
-            get
-            {
-                return _gameState;
             }
         }
 
@@ -132,15 +124,31 @@ namespace GameplayFramework
 
         private void SetGameMode(GameMode mode)
         {
-            GameMode oldMode = _gameMode;
+            lock(_gameModeLock)
+            {
+                GameMode oldMode = _gameMode;
 
-            _gameMode = mode;
-            _gameMode.Initialize(_anchor);
+                _gameMode = mode;
+                _gameMode.Initialize(_anchor);
 
-            if(oldMode != null)
-                oldMode.EndMode();
+                if(oldMode != null)
+                    oldMode.EndMode();
 
-            _gameMode.BeginMode();
+                _gameMode.BeginMode();
+            }
+        }
+
+        #endregion
+
+        #region Game State
+
+        private GameState _gameState;
+        public GameState GameState
+        {
+            get
+            {
+                return _gameState;
+            }
         }
 
         #endregion
@@ -148,16 +156,16 @@ namespace GameplayFramework
         #region Scene loading
 
         private readonly object _sceneLock = new object();
-
         private AsyncOperation _sceneLoader;
 
 
         public event EventHandler PreLoadScene;
+        public event EventHandler DuringLoadScene;
         public event EventHandler PostLoadScene;
 
 
 
-        public virtual void LoadScene(SceneName scene)
+        public void LoadScene(SceneName scene)
         {
             lock(_sceneLock)
             {
@@ -171,10 +179,14 @@ namespace GameplayFramework
                     preLoadScene(null, EventArgs.Empty);
                 
                 _sceneLoader = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+
+                var duringLoadScene = DuringLoadScene;
+                if(duringLoadScene != null)
+                    duringLoadScene(null, EventArgs.Empty);
             }
         }
 
-        public virtual void Tick()
+        private void Tick()
         {
             AsyncOperation sceneLoader = _sceneLoader;
 

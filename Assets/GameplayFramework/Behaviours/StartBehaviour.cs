@@ -1,9 +1,30 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace GameplayFramework
 {
     public class StartBehaviour : MonoBehaviour
     {
+        #region Singleton
+
+        private static readonly object _instanceLock = new object();
+        private static StartBehaviour _instance;
+
+        public StartBehaviour()
+        {
+            lock(_instanceLock)
+            {
+                if(_instance != null)
+                    throw new InvalidOperationException("The '" + typeof(StartBehaviour).Name + "' can only be instanciated once.");
+                
+                _instance = this;
+            }
+        }
+
+        #endregion
+
+
+
         [SerializeField]
         private SceneName _startScene;
 
@@ -52,6 +73,7 @@ namespace GameplayFramework
             Game.Initialize(anchor);
 
             Game.Current.PreLoadScene += (sender, e) => StartScenePreLoadInternal();
+            Game.Current.DuringLoadScene += (sender, e) => StartSceneDuringLoadInternal();
             Game.Current.PostLoadScene += (sender, e) => StartScenePostLoadInternal();
 
             Game.Current.LoadScene(StartScene);
@@ -67,6 +89,14 @@ namespace GameplayFramework
 
 
 
+        private void StartSceneDuringLoadInternal()
+        {
+            Game.Current.DuringLoadScene -= (sender2, e2) => StartSceneDuringLoadInternal();
+            StartSceneDuringLoad();
+        }
+
+
+
         private void StartScenePostLoadInternal()
         {
             Game.Current.PostLoadScene -= (sender2, e2) => StartScenePostLoadInternal();
@@ -78,8 +108,15 @@ namespace GameplayFramework
 
         protected virtual void StartScenePreLoad()
         {
-            Game.Current.SetGameMode(GameModeName.GameMode);
             Debug.Log("StartScenePreLoad");
+        }
+
+
+
+        protected virtual void StartSceneDuringLoad()
+        {
+            Debug.Log("StartSceneDuringLoad");
+            Game.Current.SetGameMode(GameModeName.GameMode);
         }
 
 

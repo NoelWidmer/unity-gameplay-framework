@@ -5,6 +5,31 @@ namespace GameplayFramework
 {
     public class Anchor : MonoBehaviour
     {
+        #region Singleton
+
+        private static readonly object _instanceLock = new object();
+        private static Anchor _instance;
+
+
+
+        private void Awake()
+        {
+            lock(_instanceLock)
+            {
+                if(_instance != null)
+                {
+                    Destroy(this);
+                    throw new InvalidOperationException("The Anchor has already been instanciated.");
+                }
+                
+                _instance = this;
+            }
+        }
+
+        #endregion
+
+
+
         public event EventHandler TickInput;
         public event EventHandler TickControl;
         public event EventHandler TickCamera;
