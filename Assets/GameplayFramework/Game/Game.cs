@@ -7,59 +7,126 @@ using UnityEngine.SceneManagement;
 
 namespace GameplayFramework
 {
-    public sealed class Game
+    public static class Game
     {
-        #region Singleton
+        private static readonly System.Diagnostics.Stopwatch _normalWatch = new System.Diagnostics.Stopwatch();
+        private static readonly System.Diagnostics.Stopwatch _lateWatch = new System.Diagnostics.Stopwatch();
+        private static readonly System.Diagnostics.Stopwatch _fixedWatch = new System.Diagnostics.Stopwatch();
+        
 
-        private static readonly object _instanceLock = new object();
-        private static Anchor _anchor;
-        private static Game _instance;
 
-        private Game(Anchor anchor)
+        public static void Initialize()
         {
-            lock(_instanceLock)
+            _normalWatch.Start();
+            _lateWatch.Start();
+            _fixedWatch.Start();
+        }
+
+
+
+        #region Tick Events
+
+        public static event TickHandler TickInput;
+        public static event TickHandler TickControl;
+        public static event TickHandler TickCamera;
+        public static event TickHandler TickHUD;
+        public static event TickHandler TickActor;
+        public static event TickHandler TickMode;
+
+        public static event TickHandler TickLate;
+        public static event TickHandler TickFixed;
+
+        private static float _gameTime;
+
+
+
+        public static void OnUnityUpdate()
+        {
+            float deltaTime = _normalWatch.Elapsed.Milliseconds / 1000f;
+            _normalWatch.Reset();
+
+            TickArgs tickArgs = new TickArgs(deltaTime);
+            _gameTime += deltaTime;
+
             {
-                if(_instance != null)
-                    throw new InvalidOperationException("The Game has already been initialized.");
+                var tickInput = TickInput;
+                if(tickInput != null)
+                    tickInput(tickArgs);
+            }
 
-                Debug.Log("Game.Initialize");
+            {
+                var tickControl = TickControl;
+                if(tickControl != null)
+                    tickControl(tickArgs);
+            }
 
-                _anchor = anchor;
-                _instance = this;
+            {
+                var tickCamera = TickCamera;
+                if(tickCamera != null)
+                    tickCamera(tickArgs);
+            }
+
+            {
+                var tickHUD = TickHUD;
+                if(tickHUD != null)
+                    tickHUD(tickArgs);
+            }
+
+            {
+                var tickActor = TickActor;
+                if(tickActor != null)
+                    tickActor(tickArgs);
+            }
+
+            {
+                var tickMode = TickMode;
+                if(tickMode != null)
+                    tickMode(tickArgs);
+            }
+
+            Tick(tickArgs);
+        }
+
+
+
+        public static void OnUnityLateUpdate()
+        {
+            float deltaTime = _lateWatch.Elapsed.Milliseconds / 1000f;
+            _normalWatch.Reset();
+
+            TickArgs tickArgs = new TickArgs(deltaTime);
+
+            {
+                var tickLate = TickLate;
+                if(tickLate != null)
+                    tickLate(tickArgs);
             }
         }
 
 
 
-        public static Game Current
+        public static void OnUnityFixedUpdate()
         {
-            get
+            float deltaTime = _fixedWatch.Elapsed.Milliseconds / 1000f;
+            _normalWatch.Reset();
+
+            TickArgs tickArgs = new TickArgs(deltaTime);
+
             {
-                return _instance;
+                var tickFixed = TickFixed;
+                if(tickFixed != null)
+                    tickFixed(tickArgs);
             }
-        }
-
-
-
-        public static void Initialize(Anchor anchor)
-        {
-            if(anchor == null)
-                throw new ArgumentNullException("anchor");
-
-            new Game(anchor);
-            anchor.TickLast += _instance.Tick;
         }
 
         #endregion
 
-        private float _timeSinceStart = 0f;
-
         #region GameMode
 
-        private readonly object _gameModeLock = new object();
-        private GameMode _gameMode;
+        private static readonly object _gameModeLock = new object();
+        private static GameMode _gameMode;
 
-        public GameMode GameMode
+        public static GameMode GameMode
         {
             get
             {
@@ -69,7 +136,7 @@ namespace GameplayFramework
 
 
 
-        public void SetGameMode(GameModeName gameMode)
+        public static void SetGameMode(GameModeName gameMode)
         {
             string gameModeName = Enum.GetName(typeof(GameModeName), gameMode);
 
@@ -119,21 +186,21 @@ namespace GameplayFramework
 
 
 
-        public void SetGameMode<T>() where T : GameMode, new()
+        public static void SetGameMode<T>() where T : GameMode, new()
         {
             SetGameMode(new T());
         }
 
 
 
-        private void SetGameMode(GameMode mode)
+        private static void SetGameMode(GameMode mode)
         {
             lock(_gameModeLock)
             {
                 GameMode oldMode = _gameMode;
 
                 _gameMode = mode;
-                _gameMode.Initialize(_anchor);
+                _gameMode.Initialize();
 
                 if(oldMode != null)
                     oldMode.EndMode();
@@ -146,8 +213,8 @@ namespace GameplayFramework
 
         #region Game State
 
-        private GameState _gameState;
-        public GameState GameState
+        private static GameState _gameState;
+        public static GameState GameState
         {
             get
             {
@@ -163,17 +230,17 @@ namespace GameplayFramework
 
         #region Scene loading
 
-        private readonly object _sceneLock = new object();
-        private AsyncOperation _sceneLoader;
+        private static readonly object _sceneLock = new object();
+        private static AsyncOperation _sceneLoader;
 
 
-        public event EventHandler ScenePreLoad;
-        public event EventHandler SceneLoadBegin;
-        public event EventHandler ScenePostLoad;
+        public static event EventHandler ScenePreLoad;
+        public static event EventHandler SceneLoadBegin;
+        public static event EventHandler ScenePostLoad;
 
 
 
-        public void LoadScene(SceneName scene)
+        public static void LoadScene(SceneName scene)
         {
             lock(_sceneLock)
             {
@@ -194,11 +261,8 @@ namespace GameplayFramework
             }
         }
 
-        private void Tick(TickArgs e)
+        private static void Tick(TickArgs e)
         {
-            // Update time
-            _timeSinceStart += e.DeltaTime;
-
             // Check scene loading
             {
                 AsyncOperation sceneLoader = _sceneLoader;

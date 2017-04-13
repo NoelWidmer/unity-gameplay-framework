@@ -5,16 +5,9 @@ namespace GameplayFramework
 {
     public class GameMode
     {
-        private Anchor _anchor;
-
-        public void Initialize(Anchor anchor)
+        public void Initialize()
         {
-            if(anchor == null)
-                throw new ArgumentNullException("anchor");
-
-            _anchor = anchor;
-            anchor.TickMode += Tick;
-
+            Game.TickMode += Tick;
             Debug.Log("Initializing GameMode: " + GetType().Name);
         }
 
@@ -24,7 +17,7 @@ namespace GameplayFramework
         public virtual void BeginMode()
         {
             Debug.Log("Begin GameMode: " + GetType().Name);
-            Game.Current.GameState = new GameState();
+            Game.GameState = new GameState();
         }
 
 
@@ -38,7 +31,7 @@ namespace GameplayFramework
         public virtual void EndMode()
         {
             Debug.Log("End GameMode: " + GetType().Name);
-            _anchor.TickMode -= Tick;
+            Game.TickMode -= Tick;
         }
     }
 }

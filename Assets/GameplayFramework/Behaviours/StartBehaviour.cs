@@ -51,10 +51,6 @@ namespace GameplayFramework
 
         #endregion
 
-        protected Anchor Anchor { get; private set; }
-
-
-
         private void Awake()
         {
             DontDestroyOnLoad(this);
@@ -69,7 +65,7 @@ namespace GameplayFramework
                 anchorGo.hideFlags = HideFlags.HideInHierarchy;
                 anchorGo.transform.parent = gf.transform;
 
-                Anchor = anchorGo.AddComponent<Anchor>();
+                anchorGo.AddComponent<Anchor>();
             }
 
             BeginGame();
@@ -82,12 +78,12 @@ namespace GameplayFramework
             Debug.Log("StartBehaviour.BeginGame");
 
             // Initialize Game.
-            Game.Initialize(Anchor);
+            Game.Initialize();
 
-            Game.Current.ScenePreLoad += (sender, e) => OnScenePreLoad();
-            Game.Current.ScenePostLoad += (sender, e) => OnScenePostLoad();
+            Game.ScenePreLoad += (sender, e) => OnScenePreLoad();
+            Game.ScenePostLoad += (sender, e) => OnScenePostLoad();
 
-            Game.Current.LoadScene(StartScene);
+            Game.LoadScene(StartScene);
         }
 
 
@@ -96,8 +92,8 @@ namespace GameplayFramework
         {
             Debug.Log("StartBehaviour.OnScenePreLoad");
 
-            Game.Current.ScenePreLoad -= (sender, e) => OnScenePreLoad();
-            Game.Current.SetGameMode(GameModeName.GameMode);
+            Game.ScenePreLoad -= (sender, e) => OnScenePreLoad();
+            Game.SetGameMode(GameModeName.GameMode);
         }
 
 
@@ -106,7 +102,7 @@ namespace GameplayFramework
         {
             Debug.Log("StartBehaviour.OnScenePostLoad");
 
-            Game.Current.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();
+            Game.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();
             Destroy(gameObject);
         }
     }
