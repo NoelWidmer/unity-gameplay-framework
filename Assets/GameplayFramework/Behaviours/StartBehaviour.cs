@@ -23,7 +23,7 @@ namespace GameplayFramework
 
         #endregion
 
-
+        #region Start Scene and Start Mode
 
         [SerializeField]
         private SceneName _startScene;
@@ -49,6 +49,10 @@ namespace GameplayFramework
             }
         }
 
+        #endregion
+
+        protected Anchor Anchor { get; private set; }
+
 
 
         private void Awake()
@@ -60,70 +64,50 @@ namespace GameplayFramework
             DontDestroyOnLoad(gf);
 
             // Create Anchor.
-            Anchor anchor;
             {
                 var anchorGo = new GameObject("Anchor");
                 anchorGo.hideFlags = HideFlags.HideInHierarchy;
                 anchorGo.transform.parent = gf.transform;
 
-                anchor = anchorGo.AddComponent<Anchor>();
+                Anchor = anchorGo.AddComponent<Anchor>();
             }
 
-            // Initialize Game.
-            Game.Initialize(anchor);
+            BeginGame();
+        }
 
-            Game.Current.PreLoadScene += (sender, e) => StartScenePreLoadInternal();
-            Game.Current.DuringLoadScene += (sender, e) => StartSceneDuringLoadInternal();
-            Game.Current.PostLoadScene += (sender, e) => StartScenePostLoadInternal();
+
+
+        protected virtual void BeginGame()
+        {
+            Debug.Log("StartBehaviour.BeginGame");
+
+            // Initialize Game.
+            Game.Initialize(Anchor);
+
+            Game.Current.ScenePreLoad += (sender, e) => OnScenePreLoad();
+            Game.Current.ScenePostLoad += (sender, e) => OnScenePostLoad();
 
             Game.Current.LoadScene(StartScene);
         }
 
 
 
-        private void StartScenePreLoadInternal()
+        private void OnScenePreLoad()
         {
-            Game.Current.PreLoadScene -= (sender, e) => StartScenePreLoadInternal();
-            StartScenePreLoad();
-        }
+            Debug.Log("StartBehaviour.OnScenePreLoad");
 
-
-
-        private void StartSceneDuringLoadInternal()
-        {
-            Game.Current.DuringLoadScene -= (sender2, e2) => StartSceneDuringLoadInternal();
-            StartSceneDuringLoad();
-        }
-
-
-
-        private void StartScenePostLoadInternal()
-        {
-            Game.Current.PostLoadScene -= (sender2, e2) => StartScenePostLoadInternal();
-            StartScenePostLoad();
-            Destroy(gameObject);
-        }
-
-
-
-        protected virtual void StartScenePreLoad()
-        {
-            Debug.Log("StartScenePreLoad");
-        }
-
-
-
-        protected virtual void StartSceneDuringLoad()
-        {
-            Debug.Log("StartSceneDuringLoad");
+            Game.Current.ScenePreLoad -= (sender, e) => OnScenePreLoad();
             Game.Current.SetGameMode(GameModeName.GameMode);
         }
 
 
 
-        protected virtual void StartScenePostLoad()
+        private void OnScenePostLoad()
         {
-            Debug.Log("StartScenePostLoad");
+            Debug.Log("StartBehaviour.OnScenePostLoad");
+
+            Game.Current.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();
+            Destroy(gameObject);
         }
     }
 }

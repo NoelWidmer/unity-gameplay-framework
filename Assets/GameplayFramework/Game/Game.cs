@@ -22,6 +22,8 @@ namespace GameplayFramework
                 if(_instance != null)
                     throw new InvalidOperationException("The Game has already been initialized.");
 
+                Debug.Log("Game.Initialize");
+
                 _anchor = anchor;
                 _instance = this;
             }
@@ -149,6 +151,10 @@ namespace GameplayFramework
             {
                 return _gameState;
             }
+            set
+            {
+                _gameState = value;
+            }
         }
 
         #endregion
@@ -159,9 +165,9 @@ namespace GameplayFramework
         private AsyncOperation _sceneLoader;
 
 
-        public event EventHandler PreLoadScene;
-        public event EventHandler DuringLoadScene;
-        public event EventHandler PostLoadScene;
+        public event EventHandler ScenePreLoad;
+        public event EventHandler SceneLoadBegin;
+        public event EventHandler ScenePostLoad;
 
 
 
@@ -174,13 +180,13 @@ namespace GameplayFramework
 
                 string sceneName = Enum.GetName(typeof(SceneName), scene);
 
-                var preLoadScene = PreLoadScene;
+                var preLoadScene = ScenePreLoad;
                 if(preLoadScene != null)
                     preLoadScene(null, EventArgs.Empty);
                 
                 _sceneLoader = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 
-                var duringLoadScene = DuringLoadScene;
+                var duringLoadScene = SceneLoadBegin;
                 if(duringLoadScene != null)
                     duringLoadScene(null, EventArgs.Empty);
             }
@@ -196,7 +202,7 @@ namespace GameplayFramework
                 {
                     _sceneLoader = null;
 
-                    var postLoadScene = PostLoadScene;
+                    var postLoadScene = ScenePostLoad;
                     if(postLoadScene != null)
                         postLoadScene(null, EventArgs.Empty);
                 }

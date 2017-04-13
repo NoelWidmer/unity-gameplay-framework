@@ -24,13 +24,13 @@ namespace GameplayFramework
         public virtual void BeginMode()
         {
             Debug.Log("Begin GameMode: " + GetType().Name);
+            Game.Current.GameState = new GameState();
         }
 
 
 
         protected virtual void Tick()
         {
-            Debug.Log("TODO set game state.");
         }
 
 
@@ -38,6 +38,7 @@ namespace GameplayFramework
         public virtual void EndMode()
         {
             Debug.Log("End GameMode: " + GetType().Name);
+            _anchor.TickMode -= (sender, e) => Tick();
         }
     }
 }

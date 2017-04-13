@@ -10,18 +10,13 @@ namespace GameplayFramework
         private static readonly object _instanceLock = new object();
         private static Anchor _instance;
 
-
-
-        private void Awake()
+        public Anchor()
         {
             lock(_instanceLock)
             {
                 if(_instance != null)
-                {
-                    Destroy(this);
-                    throw new InvalidOperationException("The Anchor has already been instanciated.");
-                }
-                
+                    throw new InvalidOperationException("The '" + typeof(Anchor).Name + "' can only be instanciated once.");
+
                 _instance = this;
             }
         }
@@ -37,6 +32,11 @@ namespace GameplayFramework
         public event EventHandler TickActor;
         public event EventHandler TickMode;
         public event EventHandler TickLast;
+
+        public event EventHandler TickLate;
+        public event EventHandler TickFixed;
+
+
 
         protected virtual void Update()
         {
@@ -80,6 +80,24 @@ namespace GameplayFramework
                 var tickLast = TickLast;
                 if(tickLast != null)
                     tickLast(this, EventArgs.Empty);
+            }
+        }
+
+        protected virtual void LateUpdate()
+        {
+            {
+                var tickLate = TickLate;
+                if(tickLate != null)
+                    tickLate(this, EventArgs.Empty);
+            }
+        }
+
+        protected virtual void FixedUpdate()
+        {
+            {
+                var tickFixed = TickFixed;
+                if(tickFixed != null)
+                    tickFixed(this, EventArgs.Empty);
             }
         }
     }
