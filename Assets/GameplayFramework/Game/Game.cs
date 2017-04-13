@@ -47,10 +47,12 @@ namespace GameplayFramework
                 throw new ArgumentNullException("anchor");
 
             new Game(anchor);
-            anchor.TickLast += (sender, e) => _instance.Tick();
+            anchor.TickLast += _instance.Tick;
         }
 
         #endregion
+
+        private float _timeSinceStart = 0f;
 
         #region GameMode
 
@@ -192,19 +194,25 @@ namespace GameplayFramework
             }
         }
 
-        private void Tick()
+        private void Tick(TickArgs e)
         {
-            AsyncOperation sceneLoader = _sceneLoader;
+            // Update time
+            _timeSinceStart += e.DeltaTime;
 
-            if(sceneLoader != null && sceneLoader.isDone)
+            // Check scene loading
             {
-                lock(_sceneLock)
-                {
-                    _sceneLoader = null;
+                AsyncOperation sceneLoader = _sceneLoader;
 
-                    var postLoadScene = ScenePostLoad;
-                    if(postLoadScene != null)
-                        postLoadScene(null, EventArgs.Empty);
+                if(sceneLoader != null && sceneLoader.isDone)
+                {
+                    lock(_sceneLock)
+                    {
+                        _sceneLoader = null;
+
+                        var postLoadScene = ScenePostLoad;
+                        if(postLoadScene != null)
+                            postLoadScene(null, EventArgs.Empty);
+                    }
                 }
             }
         }

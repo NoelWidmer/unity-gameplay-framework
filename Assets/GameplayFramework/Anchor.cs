@@ -1,10 +1,17 @@
 ﻿using System;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace GameplayFramework
 {
     public class Anchor : MonoBehaviour
     {
+        private readonly Stopwatch _normalWatch = new Stopwatch();
+        private readonly Stopwatch _lateWatch = new Stopwatch();
+        private readonly Stopwatch _fixedWatch = new Stopwatch();
+
+
+
         #region Singleton
 
         private static readonly object _instanceLock = new object();
@@ -24,80 +31,108 @@ namespace GameplayFramework
         #endregion
 
 
+        private float _gameTime;
 
-        public event EventHandler TickInput;
-        public event EventHandler TickControl;
-        public event EventHandler TickCamera;
-        public event EventHandler TickHUD;
-        public event EventHandler TickActor;
-        public event EventHandler TickMode;
-        public event EventHandler TickLast;
+        public event TickHandler TickInput;
+        public event TickHandler TickControl;
+        public event TickHandler TickCamera;
+        public event TickHandler TickHUD;
+        public event TickHandler TickActor;
+        public event TickHandler TickMode;
+        public event TickHandler TickLast;
 
-        public event EventHandler TickLate;
-        public event EventHandler TickFixed;
+        public event TickHandler TickLate;
+        public event TickHandler TickFixed;
+
+
+
+        protected virtual void Awake()
+        {
+            _gameTime = Time.time;
+
+            _normalWatch.Start();
+            _lateWatch.Start();
+            _fixedWatch.Start();
+        }
 
 
 
         protected virtual void Update()
         {
+            float deltaTime = _normalWatch.Elapsed.Milliseconds / 1000f;
+            _normalWatch.Reset();
+            
+            TickArgs tickArgs = new TickArgs(deltaTime);
+            _gameTime += deltaTime;
+
             {
                 var tickInput = TickInput;
                 if(tickInput != null)
-                    tickInput(this, EventArgs.Empty);
+                    tickInput(tickArgs);
             }
 
             {
                 var tickControl = TickControl;
                 if(tickControl != null)
-                    tickControl(this, EventArgs.Empty);
+                    tickControl(tickArgs);
             }
 
             {
                 var tickCamera = TickCamera;
                 if(tickCamera != null)
-                    tickCamera(this, EventArgs.Empty);
+                    tickCamera(tickArgs);
             }
 
             {
                 var tickHUD = TickHUD;
                 if(tickHUD != null)
-                    tickHUD(this, EventArgs.Empty);
+                    tickHUD(tickArgs);
             }
 
             {
                 var tickActor = TickActor;
                 if(tickActor != null)
-                    tickActor(this, EventArgs.Empty);
+                    tickActor(tickArgs);
             }
 
             {
                 var tickMode = TickMode;
                 if(tickMode != null)
-                    tickMode(this, EventArgs.Empty);
+                    tickMode(tickArgs);
             }
 
             {
                 var tickLast = TickLast;
                 if(tickLast != null)
-                    tickLast(this, EventArgs.Empty);
+                    tickLast(tickArgs);
             }
         }
 
         protected virtual void LateUpdate()
         {
+            float deltaTime = _lateWatch.Elapsed.Milliseconds / 1000f;
+            _normalWatch.Reset();
+
+            TickArgs tickArgs = new TickArgs(deltaTime);
+
             {
                 var tickLate = TickLate;
                 if(tickLate != null)
-                    tickLate(this, EventArgs.Empty);
+                    tickLate(tickArgs);
             }
         }
 
         protected virtual void FixedUpdate()
         {
+            float deltaTime = _fixedWatch.Elapsed.Milliseconds / 1000f;
+            _normalWatch.Reset();
+
+            TickArgs tickArgs = new TickArgs(deltaTime);
+
             {
                 var tickFixed = TickFixed;
                 if(tickFixed != null)
-                    tickFixed(this, EventArgs.Empty);
+                    tickFixed(tickArgs);
             }
         }
     }

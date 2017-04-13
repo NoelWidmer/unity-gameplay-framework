@@ -13,7 +13,7 @@ namespace GameplayFramework
                 throw new ArgumentNullException("anchor");
 
             _anchor = anchor;
-            anchor.TickMode += (sender, e) => Tick();
+            anchor.TickMode += Tick;
 
             Debug.Log("Initializing GameMode: " + GetType().Name);
         }
@@ -29,7 +29,7 @@ namespace GameplayFramework
 
 
 
-        protected virtual void Tick()
+        protected virtual void Tick(TickArgs e)
         {
         }
 
@@ -38,7 +38,7 @@ namespace GameplayFramework
         public virtual void EndMode()
         {
             Debug.Log("End GameMode: " + GetType().Name);
-            _anchor.TickMode -= (sender, e) => Tick();
+            _anchor.TickMode -= Tick;
         }
     }
 }
