@@ -23,7 +23,7 @@ namespace GameplayFramework
 
         #endregion
 
-        #region Start Scene and Start Mode
+
 
         [SerializeField]
         private SceneName _startScene;
@@ -33,7 +33,7 @@ namespace GameplayFramework
 
 
 
-        public SceneName StartScene
+        protected SceneName StartScene
         {
             get
             {
@@ -41,7 +41,7 @@ namespace GameplayFramework
             }
         }
 
-        public GameModeName StartGameMode
+        protected GameModeName StartGameMode
         {
             get
             {
@@ -49,7 +49,7 @@ namespace GameplayFramework
             }
         }
 
-        #endregion
+
 
         private void Awake()
         {
@@ -64,21 +64,18 @@ namespace GameplayFramework
                 var anchorGo = new GameObject("Anchor");
                 anchorGo.hideFlags = HideFlags.HideInHierarchy;
                 anchorGo.transform.parent = gf.transform;
-
                 anchorGo.AddComponent<Anchor>();
             }
 
-            BeginGame();
+            StartGame();
         }
 
 
 
-        protected virtual void BeginGame()
+        protected virtual void StartGame()
         {
-            Debug.Log("StartBehaviour.BeginGame");
-
             // Initialize Game.
-            Game.Initialize();
+            Game.Initialize(new Game());
 
             Game.ScenePreLoad += (sender, e) => OnScenePreLoad();
             Game.ScenePostLoad += (sender, e) => OnScenePostLoad();
@@ -90,8 +87,6 @@ namespace GameplayFramework
 
         private void OnScenePreLoad()
         {
-            Debug.Log("StartBehaviour.OnScenePreLoad");
-
             Game.ScenePreLoad -= (sender, e) => OnScenePreLoad();
             Game.SetGameMode(GameModeName.GameMode);
         }
@@ -100,8 +95,6 @@ namespace GameplayFramework
 
         private void OnScenePostLoad()
         {
-            Debug.Log("StartBehaviour.OnScenePostLoad");
-
             Game.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();
             Destroy(gameObject);
         }

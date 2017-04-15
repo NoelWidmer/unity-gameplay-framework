@@ -7,24 +7,35 @@ using UnityEngine.SceneManagement;
 
 namespace GameplayFramework
 {
-    public static class Game
+    public class Game
     {
-        private static readonly System.Diagnostics.Stopwatch _normalWatch = new System.Diagnostics.Stopwatch();
-        private static readonly System.Diagnostics.Stopwatch _lateWatch = new System.Diagnostics.Stopwatch();
-        private static readonly System.Diagnostics.Stopwatch _fixedWatch = new System.Diagnostics.Stopwatch();
-        
+        #region Static
+
+        private static readonly object _instanceLock = new object();
+        private static Game _instance;      
 
 
-        public static void Initialize()
+        public static void Initialize(Game game)
         {
+            if(game == null)
+                throw new ArgumentNullException("game");
+
+            lock(_instanceLock)
+            {
+                if(_instance != null)
+                    throw new InvalidOperationException("The '" + typeof(Game).Name + "' can only be initialized once.");
+
+                _instance = game;
+            }
+
+            PlayTime = Time.time;
+
             _normalWatch.Start();
             _lateWatch.Start();
-            _fixedWatch.Start();
+            fixedWatch.Start();
         }
 
 
-
-        #region Tick Events
 
         public static event TickHandler TickInput;
         public static event TickHandler TickControl;
@@ -36,17 +47,132 @@ namespace GameplayFramework
         public static event TickHandler TickLate;
         public static event TickHandler TickFixed;
 
-        private static float _gameTime;
+        public static float PlayTime
+        {
+            get;
+            protected set;
+        }
 
 
+
+        private static readonly System.Diagnostics.Stopwatch _normalWatch = new System.Diagnostics.Stopwatch();
+        private static readonly System.Diagnostics.Stopwatch _lateWatch = new System.Diagnostics.Stopwatch();
+        private static readonly System.Diagnostics.Stopwatch fixedWatch = new System.Diagnostics.Stopwatch();
 
         public static void OnUnityUpdate()
+        {
+            _instance.OnUnityUpdateImplementation();
+        }
+
+        public static void OnUnityLateUpdate()
+        {
+            _instance.OnUnityUpdateImplementation();
+        }        
+
+        public static void OnUnityFixedUpdate()
+        {
+            _instance.OnUnityFixedUpdateImplementation();
+        }
+
+
+
+        private static readonly object _gameModeLock = new object();
+
+        public static GameMode GameMode
+        {
+            get;
+            protected set;
+        }
+
+        public static void SetGameMode(GameModeName gameMode)
+        {
+            string gameModeName = Enum.GetName(typeof(GameModeName), gameMode);
+
+            Type type;
+
+            // Get the type of game mode.
+            {
+                Type[] types = Assembly.GetExecutingAssembly().GetTypes();
+                IEnumerable<Type> matchingTypes = types.Where(t => t.Name == gameModeName);
+
+                if(matchingTypes.Count() == 1)
+                {
+                    type = matchingTypes.First();
+                }
+                else if(matchingTypes.Count() == 0)
+                {
+                    throw new InvalidOperationException("Couldn't find a type with name '" + gameModeName + "'.");
+                }
+                else
+                {
+                    throw new InvalidOperationException("Found multiple types with name '" + gameModeName + "'.");
+                }
+            }
+
+            object instance;
+
+            // Create an instance of the game mode.
+            try
+            {
+                instance = Activator.CreateInstance(type);
+
+                if(instance == null)
+                    throw new InvalidOperationException("Couldn't create an instance of the type with name '" + gameModeName + "'.");
+            }
+            catch(Exception ex)
+            {
+                throw new InvalidOperationException("Couldn't create an instance of the type with name '" + gameModeName + "'.", ex);
+            }
+
+            // Make sure the instance is a game mode.
+            if(instance is GameMode)
+            {
+                _instance.SetGameMode((GameMode)instance);
+            }
+            else
+            {
+                throw new InvalidOperationException("The type with name '" + gameModeName + "' is not a '" + typeof(GameMode).Name + "'.");
+            }
+        }
+
+        public static void SetGameMode<T>() where T : GameMode, new()
+        {
+            _instance.SetGameMode(new T());
+        }
+
+
+
+        public static GameState GameState
+        {
+            get;
+            set;
+        }
+
+
+        
+        private static readonly object _sceneLock = new object();
+        private static AsyncOperation _sceneLoader;
+        
+        public static event EventHandler ScenePreLoad;
+        public static event EventHandler SceneLoadBegin;
+        public static event EventHandler ScenePostLoad;
+        
+        public static void LoadScene(SceneName scene)
+        {
+            _instance.LoadSceneImplementation(scene);
+        }
+
+        #endregion
+
+        #region Instance
+
+        protected virtual void OnUnityUpdateImplementation()
         {
             float deltaTime = _normalWatch.Elapsed.Milliseconds / 1000f;
             _normalWatch.Reset();
 
             TickArgs tickArgs = new TickArgs(deltaTime);
-            _gameTime += deltaTime;
+            PlayTime += deltaTime;
 
             {
                 var tickInput = TickInput;
@@ -87,9 +213,7 @@ namespace GameplayFramework
             Tick(tickArgs);
         }
 
-
-
-        public static void OnUnityLateUpdate()
+        protected virtual void OnUnityLateUpdateImplementation()
         {
             float deltaTime = _lateWatch.Elapsed.Milliseconds / 1000f;
             _normalWatch.Reset();
@@ -103,11 +227,9 @@ namespace GameplayFramework
             }
         }
 
-
-
-        public static void OnUnityFixedUpdate()
+        protected virtual void OnUnityFixedUpdateImplementation()
         {
-            float deltaTime = _fixedWatch.Elapsed.Milliseconds / 1000f;
+            float deltaTime = fixedWatch.Elapsed.Milliseconds / 1000f;
             _normalWatch.Reset();
 
             TickArgs tickArgs = new TickArgs(deltaTime);
@@ -119,128 +241,23 @@ namespace GameplayFramework
             }
         }
 
-        #endregion
-
-        #region GameMode
-
-        private static readonly object _gameModeLock = new object();
-        private static GameMode _gameMode;
-
-        public static GameMode GameMode
-        {
-            get
-            {
-                return _gameMode;
-            }
-        }
-
-
-
-        public static void SetGameMode(GameModeName gameMode)
-        {
-            string gameModeName = Enum.GetName(typeof(GameModeName), gameMode);
-
-            Type type;
-
-            // Get the type of game mode.
-            {
-                Type[] types = Assembly.GetExecutingAssembly().GetTypes();
-                IEnumerable<Type> matchingTypes = types.Where(t => t.Name == gameModeName);
-
-                if(matchingTypes.Count() == 1)
-                {
-                    type = matchingTypes.First();
-                }
-                else if(matchingTypes.Count() == 0)
-                {
-                    throw new InvalidOperationException("Couldn't find a type with name '" + gameModeName + "'.");
-                }
-                else
-                {
-                    throw new InvalidOperationException("Found multiple types with name '" + gameModeName + "'.");
-                }
-            }
-
-            object instance;
-
-            // Create an instance of the game mode.
-            try
-            {
-                instance = Activator.CreateInstance(type);
-            }
-            catch(Exception ex)
-            {
-                throw new InvalidOperationException("Couldn't create an instance of the type with name '" + gameModeName + "'.", ex);
-            }
-
-            // Make sure the instance is a game mode.
-            if(instance is GameMode)
-            {
-                SetGameMode((GameMode)instance);
-            }
-            else
-            {
-                throw new InvalidOperationException("The type with name '" + gameModeName + "' is not a '" + typeof(GameMode).Name + "'.");
-            }
-        }
-
-
-
-        public static void SetGameMode<T>() where T : GameMode, new()
-        {
-            SetGameMode(new T());
-        }
-
-
-
-        private static void SetGameMode(GameMode mode)
+        protected virtual void SetGameMode(GameMode mode)
         {
             lock(_gameModeLock)
             {
-                GameMode oldMode = _gameMode;
+                GameMode oldMode = GameMode;
 
-                _gameMode = mode;
-                _gameMode.Initialize();
+                GameMode = mode;
+                GameMode.Initialize();
 
                 if(oldMode != null)
                     oldMode.EndMode();
 
-                _gameMode.BeginMode();
+                GameMode.BeginMode();
             }
         }
 
-        #endregion
-
-        #region Game State
-
-        private static GameState _gameState;
-        public static GameState GameState
-        {
-            get
-            {
-                return _gameState;
-            }
-            set
-            {
-                _gameState = value;
-            }
-        }
-
-        #endregion
-
-        #region Scene loading
-
-        private static readonly object _sceneLock = new object();
-        private static AsyncOperation _sceneLoader;
-
-
-        public static event EventHandler ScenePreLoad;
-        public static event EventHandler SceneLoadBegin;
-        public static event EventHandler ScenePostLoad;
-
-
-
-        public static void LoadScene(SceneName scene)
+        protected virtual void LoadSceneImplementation(SceneName scene)
         {
             lock(_sceneLock)
             {
@@ -252,7 +269,7 @@ namespace GameplayFramework
                 var preLoadScene = ScenePreLoad;
                 if(preLoadScene != null)
                     preLoadScene(null, EventArgs.Empty);
-                
+
                 _sceneLoader = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 
                 var duringLoadScene = SceneLoadBegin;
@@ -261,22 +278,22 @@ namespace GameplayFramework
             }
         }
 
-        private static void Tick(TickArgs e)
+
+
+        protected virtual void Tick(TickArgs e)
         {
             // Check scene loading
+            AsyncOperation sceneLoader = _sceneLoader;
+
+            if(sceneLoader != null && sceneLoader.isDone)
             {
-                AsyncOperation sceneLoader = _sceneLoader;
-
-                if(sceneLoader != null && sceneLoader.isDone)
+                lock(_sceneLock)
                 {
-                    lock(_sceneLock)
-                    {
-                        _sceneLoader = null;
+                    _sceneLoader = null;
 
-                        var postLoadScene = ScenePostLoad;
-                        if(postLoadScene != null)
-                            postLoadScene(null, EventArgs.Empty);
-                    }
+                    var postLoadScene = ScenePostLoad;
+                    if(postLoadScene != null)
+                        postLoadScene(null, EventArgs.Empty);
                 }
             }
         }
