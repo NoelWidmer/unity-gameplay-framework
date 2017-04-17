@@ -23,14 +23,20 @@ namespace GameplayFramework
 
         #endregion
 
+        public Game Game
+        {
+            get;
+            set;
+        }
+
         protected virtual void Update()
         {
-            Game.Current.OnUnityUpdate();
+            Game.OnUnityUpdate();
         }
 
         protected virtual void FixedUpdate()
         {
-            Game.Current.OnUnityFixedUpdate();
+            Game.OnUnityFixedUpdate();
         }
     }
 }

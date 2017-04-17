@@ -12,7 +12,7 @@ namespace GameplayFramework
 
 
         private bool _tickEnabled = false;
-        public virtual bool TickEnabled
+        public bool TickEnabled
         {
             get
             {

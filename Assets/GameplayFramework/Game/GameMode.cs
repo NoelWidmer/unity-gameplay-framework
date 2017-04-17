@@ -7,6 +7,7 @@ namespace GameplayFramework
     {
         public virtual void BeginMode()
         {
+            Debug.Log("GameMode.BeginMode");
             Game.TickGameMode += Tick;
             Game.GameState = new GameState();
         }
@@ -21,6 +22,7 @@ namespace GameplayFramework
 
         public virtual void EndMode()
         {
+            Debug.Log("GameMode.EndMode");
             Game.TickGameMode -= Tick;
         }
     }

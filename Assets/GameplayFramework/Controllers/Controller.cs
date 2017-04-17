@@ -6,38 +6,37 @@ namespace GameplayFramework
     {
         public Controller()
         {
-            Game.TickControllers += Tick;
+            TickEnabled = true;
         }
 
-        private readonly object _possessionLock = new object();
-        private Pawn _pawn;
 
+        
         public Pawn Pawn
         {
-            get
-            {
-                return _pawn;
-            }
+            get;
+            protected set;
         }
 
+        #region Possess & UnPossess
 
+        private readonly object _possessionLock = new object();
 
         public event EventHandler PossessedPawn;
         public event EventHandler UnPossessedPawn;
 
 
 
-        public void Possess(Pawn pawn)
+        public virtual void Possess(Pawn pawn)
         {
             if(pawn == null)
                 throw new ArgumentNullException("pawn");
 
             lock(_possessionLock)
             {
-                if(_pawn != null)
+                if(Pawn != null)
                     UnPossess();
 
-                _pawn = pawn;
+                Pawn = pawn;
                 pawn.OnBecamePossessed(this);
 
                 var possessedPawn = PossessedPawn;
@@ -48,14 +47,14 @@ namespace GameplayFramework
 
 
 
-        public void UnPossess()
+        public virtual void UnPossess()
         {
             lock(_possessionLock)
             {
-                if(_pawn == null)
+                if(Pawn == null)
                     return;
                 
-                _pawn = null;
+                Pawn = null;
 
                 var unPossessedPawn = UnPossessedPawn;
                 if(unPossessedPawn != null)
@@ -63,17 +62,44 @@ namespace GameplayFramework
             }
         }
 
+        #endregion
 
+        #region Tick
+
+        private bool _tickEnabled = false;
+        public bool TickEnabled
+        {
+            get
+            {
+                return _tickEnabled;
+            }
+            set
+            {
+                if(value == _tickEnabled)
+                    return;
+
+                if(value)
+                {
+                    Game.TickControllers += Tick;
+                }
+                else
+                {
+                    Game.TickControllers -= Tick;
+                }
+
+                _tickEnabled = value;
+            }
+        }
 
         protected virtual void Tick(TickArgs e)
         {
         }
 
-
-
         public virtual void Dispose()
         {
-            Game.TickControllers -= Tick;
+            TickEnabled = false;
         }
+
+        #endregion
     }
 }

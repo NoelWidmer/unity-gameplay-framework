@@ -10,19 +10,19 @@ namespace GameplayFramework
         }
 
 
-
+        
         public PlayerInput PlayerInput
         {
             get;
             protected set;
         }
-
+        
         public PlayerCamera PlayerCamera
         {
             get;
             protected set;
         }
-
+        
         public PlayerHUD PlayerHUD
         {
             get;
@@ -43,24 +43,23 @@ namespace GameplayFramework
         public override void Dispose()
         {
             base.Dispose();
-
-            try
+            
+            if(PlayerInput != null)
             {
-                if(PlayerInput != null)
-                    PlayerInput.Dispose();
+                PlayerInput.Dispose();
+                PlayerInput = null;
             }
-            finally
+
+            if(PlayerCamera != null)
             {
-                try
-                {
-                    if(PlayerCamera != null)
-                        PlayerCamera.Dispose();
-                }
-                finally
-                {
-                    if(PlayerHUD != null)
-                        PlayerHUD.Dispose();
-                }
+                PlayerCamera.Dispose();
+                PlayerCamera = null;
+            }
+
+            if(PlayerHUD != null)
+            {
+                PlayerHUD.Dispose();
+                PlayerHUD = null;
             }
         }
     }

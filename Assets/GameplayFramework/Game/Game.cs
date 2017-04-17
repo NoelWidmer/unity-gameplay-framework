@@ -14,17 +14,11 @@ namespace GameplayFramework
         private static readonly object _instanceLock = new object();
         private static Game _instance;
 
-        public static Game Current
-        {
-            get
-            {
-                return _instance;
-            }
-        }
-
 
         public static void Initialize(Game game)
         {
+            Debug.Log("Game.Initialize");
+
             if(game == null)
                 throw new ArgumentNullException("game");
 
@@ -87,6 +81,7 @@ namespace GameplayFramework
 
         public static void SetGameMode(GameModeName gameMode)
         {
+            Debug.Log("Game.SetGameMode");
             string gameModeName = Enum.GetName(typeof(GameModeName), gameMode);
 
             Type type;
@@ -138,6 +133,7 @@ namespace GameplayFramework
 
         public static void SetGameMode<T>() where T : GameMode, new()
         {
+            Debug.Log("Game.SetGameMode");
             _instance.SetGameMode(new T());
         }
 
@@ -177,6 +173,7 @@ namespace GameplayFramework
 
         public static void LoadScene(SceneName scene)
         {
+            Debug.Log("Game.LoadScene");
             _instance.LoadSceneImplementation(scene);
         }
 

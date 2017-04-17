@@ -57,23 +57,35 @@ namespace GameplayFramework
             var gf = new GameObject("GameplayFramework");
             DontDestroyOnLoad(gf);
 
+            Game game = InstatiateGame();
+
             // Create Anchor.
             {
                 var anchorGo = new GameObject("Anchor");
                 anchorGo.hideFlags = HideFlags.HideInHierarchy;
                 anchorGo.transform.parent = gf.transform;
-                anchorGo.AddComponent<Anchor>();
+                Anchor anchor = anchorGo.AddComponent<Anchor>();
+                anchor.Game = game;
             }
 
-            StartGame();
+            StartGame(game);
         }
 
 
 
-        protected virtual void StartGame()
+        protected virtual Game InstatiateGame()
         {
+            return new Game();
+        }
+
+
+
+        protected virtual void StartGame(Game game)
+        {
+            Debug.Log("StartBehaviour.StartGame");
+
             // Initialize Game.
-            Game.Initialize(new Game());
+            Game.Initialize(game);
             Game.ScenePostLoad += (sender, e) => OnScenePostLoad();
             Game.ScenePreLoad += (sender, e) => OnScenePreLoad();
             Game.LoadScene(StartScene);
