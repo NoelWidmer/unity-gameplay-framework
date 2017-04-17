@@ -5,18 +5,9 @@ namespace GameplayFramework
 {
     public class GameMode
     {
-        public void Initialize()
-        {
-            Game.TickMode += Tick;
-            Debug.Log("Initializing GameMode: " + GetType().Name);
-        }
-
-
-
-
         public virtual void BeginMode()
         {
-            Debug.Log("Begin GameMode: " + GetType().Name);
+            Game.TickGameMode += Tick;
             Game.GameState = new GameState();
         }
 
@@ -30,8 +21,7 @@ namespace GameplayFramework
 
         public virtual void EndMode()
         {
-            Debug.Log("End GameMode: " + GetType().Name);
-            Game.TickMode -= Tick;
+            Game.TickGameMode -= Tick;
         }
     }
 }

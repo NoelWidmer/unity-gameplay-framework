@@ -1,27 +1,28 @@
 ﻿using System;
 
-
-
-public delegate void TickHandler(TickArgs e);
-
-
-
-public class TickArgs : EventArgs
+namespace GameplayFramework
 {
-    private readonly float _deltaTime;
+    public delegate void TickHandler(TickArgs e);
 
-    public TickArgs(float deltaTime)
+
+
+    public class TickArgs : EventArgs
     {
-        _deltaTime = deltaTime;
-    }
+        private readonly float _deltaTime;
 
-
-
-    public float DeltaTime
-    {
-        get
+        public TickArgs(float deltaTime)
         {
-            return _deltaTime;
+            _deltaTime = deltaTime;
+        }
+
+
+
+        public float DeltaTime
+        {
+            get
+            {
+                return _deltaTime;
+            }
         }
     }
 }

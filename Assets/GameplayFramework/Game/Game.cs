@@ -9,10 +9,18 @@ namespace GameplayFramework
 {
     public class Game
     {
-        #region Static
+        #region Singleton
 
         private static readonly object _instanceLock = new object();
-        private static Game _instance;      
+        private static Game _instance;
+
+        public static Game Current
+        {
+            get
+            {
+                return _instance;
+            }
+        }
 
 
         public static void Initialize(Game game)
@@ -28,24 +36,36 @@ namespace GameplayFramework
                 _instance = game;
             }
 
-            PlayTime = Time.time;
-
-            _normalWatch.Start();
-            _lateWatch.Start();
-            fixedWatch.Start();
+            _normalWatch.Start();            
+            _fixedWatch.Start();
         }
 
+        #endregion
 
+        #region Tick Events
 
-        public static event TickHandler TickInput;
-        public static event TickHandler TickControl;
-        public static event TickHandler TickCamera;
-        public static event TickHandler TickHUD;
+        public static event TickHandler TickPlayerInput;
+        public static event TickHandler TickControllers;
         public static event TickHandler TickActor;
-        public static event TickHandler TickMode;
-
-        public static event TickHandler TickLate;
+        public static event TickHandler TickPlayerCamera;
+        public static event TickHandler TickPlayerHUD;
+        public static event TickHandler TickGameMode;
+        
         public static event TickHandler TickFixed;
+
+
+
+        protected virtual void Tick(TickArgs e)
+        {
+            CheckLoadSceneCompletion();
+        }
+
+        #endregion
+
+        #region Time
+
+        private static readonly System.Diagnostics.Stopwatch _normalWatch = new System.Diagnostics.Stopwatch();
+        private static readonly System.Diagnostics.Stopwatch _fixedWatch = new System.Diagnostics.Stopwatch();
 
         public static float PlayTime
         {
@@ -53,28 +73,9 @@ namespace GameplayFramework
             protected set;
         }
 
+        #endregion
 
-
-        private static readonly System.Diagnostics.Stopwatch _normalWatch = new System.Diagnostics.Stopwatch();
-        private static readonly System.Diagnostics.Stopwatch _lateWatch = new System.Diagnostics.Stopwatch();
-        private static readonly System.Diagnostics.Stopwatch fixedWatch = new System.Diagnostics.Stopwatch();
-
-        public static void OnUnityUpdate()
-        {
-            _instance.OnUnityUpdateImplementation();
-        }
-
-        public static void OnUnityLateUpdate()
-        {
-            _instance.OnUnityUpdateImplementation();
-        }        
-
-        public static void OnUnityFixedUpdate()
-        {
-            _instance.OnUnityFixedUpdateImplementation();
-        }
-
-
+        #region Game Mode & State
 
         private static readonly object _gameModeLock = new object();
 
@@ -140,6 +141,21 @@ namespace GameplayFramework
             _instance.SetGameMode(new T());
         }
 
+        protected virtual void SetGameMode(GameMode mode)
+        {
+            lock(_gameModeLock)
+            {
+                GameMode oldMode = GameMode;
+
+                GameMode = mode;
+
+                if(oldMode != null)
+                    oldMode.EndMode();
+
+                GameMode.BeginMode();
+            }
+        }
+
 
 
         public static GameState GameState
@@ -148,113 +164,20 @@ namespace GameplayFramework
             set;
         }
 
+        #endregion
 
-        
+        #region Scene Loading
+
         private static readonly object _sceneLock = new object();
         private static AsyncOperation _sceneLoader;
-        
+
         public static event EventHandler ScenePreLoad;
         public static event EventHandler SceneLoadBegin;
         public static event EventHandler ScenePostLoad;
-        
+
         public static void LoadScene(SceneName scene)
         {
             _instance.LoadSceneImplementation(scene);
-        }
-
-        #endregion
-
-        #region Instance
-
-        protected virtual void OnUnityUpdateImplementation()
-        {
-            float deltaTime = _normalWatch.Elapsed.Milliseconds / 1000f;
-            _normalWatch.Reset();
-
-            TickArgs tickArgs = new TickArgs(deltaTime);
-            PlayTime += deltaTime;
-
-            {
-                var tickInput = TickInput;
-                if(tickInput != null)
-                    tickInput(tickArgs);
-            }
-
-            {
-                var tickControl = TickControl;
-                if(tickControl != null)
-                    tickControl(tickArgs);
-            }
-
-            {
-                var tickCamera = TickCamera;
-                if(tickCamera != null)
-                    tickCamera(tickArgs);
-            }
-
-            {
-                var tickHUD = TickHUD;
-                if(tickHUD != null)
-                    tickHUD(tickArgs);
-            }
-
-            {
-                var tickActor = TickActor;
-                if(tickActor != null)
-                    tickActor(tickArgs);
-            }
-
-            {
-                var tickMode = TickMode;
-                if(tickMode != null)
-                    tickMode(tickArgs);
-            }
-
-            Tick(tickArgs);
-        }
-
-        protected virtual void OnUnityLateUpdateImplementation()
-        {
-            float deltaTime = _lateWatch.Elapsed.Milliseconds / 1000f;
-            _normalWatch.Reset();
-
-            TickArgs tickArgs = new TickArgs(deltaTime);
-
-            {
-                var tickLate = TickLate;
-                if(tickLate != null)
-                    tickLate(tickArgs);
-            }
-        }
-
-        protected virtual void OnUnityFixedUpdateImplementation()
-        {
-            float deltaTime = fixedWatch.Elapsed.Milliseconds / 1000f;
-            _normalWatch.Reset();
-
-            TickArgs tickArgs = new TickArgs(deltaTime);
-
-            {
-                var tickFixed = TickFixed;
-                if(tickFixed != null)
-                    tickFixed(tickArgs);
-            }
-        }
-
-        protected virtual void SetGameMode(GameMode mode)
-        {
-            lock(_gameModeLock)
-            {
-                GameMode oldMode = GameMode;
-
-                GameMode = mode;
-                GameMode.Initialize();
-
-                if(oldMode != null)
-                    oldMode.EndMode();
-
-                GameMode.BeginMode();
-            }
         }
 
         protected virtual void LoadSceneImplementation(SceneName scene)
@@ -280,7 +203,7 @@ namespace GameplayFramework
 
 
 
-        protected virtual void Tick(TickArgs e)
+        protected virtual void CheckLoadSceneCompletion()
         {
             // Check scene loading
             AsyncOperation sceneLoader = _sceneLoader;
@@ -295,6 +218,71 @@ namespace GameplayFramework
                     if(postLoadScene != null)
                         postLoadScene(null, EventArgs.Empty);
                 }
+            }
+        }
+
+        #endregion
+
+        #region Unity Callbacks
+
+        public virtual void OnUnityUpdate()
+        {
+            float deltaTime = _normalWatch.Elapsed.Milliseconds / 1000f;
+            _normalWatch.Reset();
+
+            TickArgs tickArgs = new TickArgs(deltaTime);
+            PlayTime += deltaTime;
+
+            {
+                var tickInput = TickPlayerInput;
+                if(tickInput != null)
+                    tickInput(tickArgs);
+            }
+
+            {
+                var tickControl = TickControllers;
+                if(tickControl != null)
+                    tickControl(tickArgs);
+            }
+
+            {
+                var tickActor = TickActor;
+                if(tickActor != null)
+                    tickActor(tickArgs);
+            }
+
+            {
+                var tickCamera = TickPlayerCamera;
+                if(tickCamera != null)
+                    tickCamera(tickArgs);
+            }
+
+            {
+                var tickHUD = TickPlayerHUD;
+                if(tickHUD != null)
+                    tickHUD(tickArgs);
+            }
+
+            {
+                var tickMode = TickGameMode;
+                if(tickMode != null)
+                    tickMode(tickArgs);
+            }
+
+            Tick(tickArgs);
+        }
+
+        public virtual void OnUnityFixedUpdate()
+        {
+            float deltaTime = _fixedWatch.Elapsed.Milliseconds / 1000f;
+            _normalWatch.Reset();
+
+            TickArgs tickArgs = new TickArgs(deltaTime);
+
+            {
+                var tickFixed = TickFixed;
+                if(tickFixed != null)
+                    tickFixed(tickArgs);
             }
         }
 

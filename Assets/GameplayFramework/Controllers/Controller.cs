@@ -1,11 +1,15 @@
 ﻿using System;
-using UnityEngine;
 
 namespace GameplayFramework
 {
-    public abstract class Controller
+    public abstract class Controller : IDisposable
     {
-        private readonly object _lock = new object();
+        public Controller()
+        {
+            Game.TickControllers += Tick;
+        }
+
+        private readonly object _possessionLock = new object();
         private Pawn _pawn;
 
         public Pawn Pawn
@@ -26,15 +30,14 @@ namespace GameplayFramework
         public void Possess(Pawn pawn)
         {
             if(pawn == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("pawn");
 
-            lock(_lock)
+            lock(_possessionLock)
             {
                 if(_pawn != null)
                     UnPossess();
 
                 _pawn = pawn;
-
                 pawn.OnBecamePossessed(this);
 
                 var possessedPawn = PossessedPawn;
@@ -47,15 +50,12 @@ namespace GameplayFramework
 
         public void UnPossess()
         {
-            lock(_lock)
+            lock(_possessionLock)
             {
                 if(_pawn == null)
                     return;
-
-                Pawn pawn = _pawn;
+                
                 _pawn = null;
-
-                pawn.OnBecameUnPossessed();
 
                 var unPossessedPawn = UnPossessedPawn;
                 if(unPossessedPawn != null)
@@ -65,8 +65,15 @@ namespace GameplayFramework
 
 
 
-        public virtual void Tick(float deltaTime)
+        protected virtual void Tick(TickArgs e)
         {
+        }
+
+
+
+        public virtual void Dispose()
+        {
+            Game.TickControllers -= Tick;
         }
     }
 }

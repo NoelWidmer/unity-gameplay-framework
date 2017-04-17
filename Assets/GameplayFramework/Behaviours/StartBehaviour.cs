@@ -16,14 +16,12 @@ namespace GameplayFramework
             {
                 if(_instance != null)
                     throw new InvalidOperationException("The '" + typeof(StartBehaviour).Name + "' can only be instanciated once.");
-                
+
                 _instance = this;
             }
         }
 
         #endregion
-
-
 
         [SerializeField]
         private SceneName _startScene;
@@ -76,23 +74,17 @@ namespace GameplayFramework
         {
             // Initialize Game.
             Game.Initialize(new Game());
-
-            Game.ScenePreLoad += (sender, e) => OnScenePreLoad();
             Game.ScenePostLoad += (sender, e) => OnScenePostLoad();
-
+            Game.ScenePreLoad += (sender, e) => OnScenePreLoad();
             Game.LoadScene(StartScene);
         }
-
-
-
+        
         private void OnScenePreLoad()
         {
             Game.ScenePreLoad -= (sender, e) => OnScenePreLoad();
             Game.SetGameMode(GameModeName.GameMode);
         }
-
-
-
+        
         private void OnScenePostLoad()
         {
             Game.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();

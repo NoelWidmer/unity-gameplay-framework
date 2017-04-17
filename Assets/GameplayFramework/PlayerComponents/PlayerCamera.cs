@@ -1,14 +1,52 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
 
 namespace GameplayFramework
 {
-    public class PlayerCamera
+    public class PlayerCamera : IDisposable
     {
-        public virtual void Tick(float deltaTime)
+        public PlayerCamera(bool tickEnabled = true)
         {
+            TickEnabled = tickEnabled;
+        }
 
+
+
+        private bool _tickEnabled = false;
+        public virtual bool TickEnabled
+        {
+            get
+            {
+                return _tickEnabled;
+            }
+            set
+            {
+                if(value == _tickEnabled)
+                    return;
+
+                if(value)
+                {
+                    Game.TickPlayerCamera += Tick;
+                }
+                else
+                {
+                    Game.TickPlayerCamera -= Tick;
+                }
+
+                _tickEnabled = value;
+            }
+        }
+
+
+
+        protected virtual void Tick(TickArgs e)
+        {
+        }
+
+
+
+        public virtual void Dispose()
+        {
+            TickEnabled = false;
         }
     }
 }

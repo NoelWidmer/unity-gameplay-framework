@@ -25,17 +25,12 @@ namespace GameplayFramework
 
         protected virtual void Update()
         {
-            Game.OnUnityUpdate();
-        }
-
-        protected virtual void LateUpdate()
-        {
-            Game.OnUnityLateUpdate();
+            Game.Current.OnUnityUpdate();
         }
 
         protected virtual void FixedUpdate()
         {
-            Game.OnUnityFixedUpdate();
+            Game.Current.OnUnityFixedUpdate();
         }
     }
 }

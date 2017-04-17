@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 namespace GameplayFramework
 {
@@ -23,7 +22,7 @@ namespace GameplayFramework
 
 
 
-        public void OnBecamePossessed(Controller controller)
+        public virtual void OnBecamePossessed(Controller controller)
         {
             if(controller == null)
                 throw new ArgumentNullException("controller");
@@ -39,6 +38,7 @@ namespace GameplayFramework
                 }
 
                 _controller = controller;
+                controller.UnPossessedPawn += (sender, e) => OnBecameUnPossessed();
 
                 var becamePossessed = BecamePossessed;
                 if(becamePossessed != null)
@@ -47,46 +47,20 @@ namespace GameplayFramework
         }
 
 
-        public void OnBecameUnPossessed()
+        protected virtual void OnBecameUnPossessed()
         {
             lock(_lock)
             {
                 if(_controller == null)
                     return;
 
+                Controller oldController = _controller;
                 _controller = null;
+                _controller.UnPossessedPawn -= (sender, e) => OnBecameUnPossessed();
 
                 var becameUnossessed = BecameUnPossessed;
                 if(becameUnossessed != null)
                     becameUnossessed(this, EventArgs.Empty);
-            }
-        }
-
-
-
-        protected virtual void TriggeredByUpdateSomehow(float deltaTime)
-        {
-            Controller controller = _controller;
-            if(controller != null && controller is PlayerController)
-            {
-                PlayerController playerController = (PlayerController)controller;
-
-                playerController.PlayerInput.Tick(deltaTime);
-                playerController.Tick(deltaTime);
-            }
-        }
-
-
-
-        protected virtual void TriggeredByLateUpdateSomehow(float deltaTime)
-        {
-            Controller controller = _controller;
-            if(controller != null && controller is PlayerController)
-            {
-                PlayerController playerController = (PlayerController)controller;
-
-                playerController.PlayerCamera.Tick(deltaTime);
-                playerController.PlayerHUD.Tick(deltaTime);
             }
         }
     }
