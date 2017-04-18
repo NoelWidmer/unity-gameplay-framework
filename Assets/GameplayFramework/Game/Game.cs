@@ -17,7 +17,7 @@ namespace GameplayFramework
 
         public static void Initialize(Game game)
         {
-            Debug.Log("Game.Initialize");
+            Debug.Log(game.GetType().Name + " initializes.");
 
             if(game == null)
                 throw new ArgumentNullException("game");
@@ -81,8 +81,8 @@ namespace GameplayFramework
 
         public static void SetGameMode(GameModeName gameMode)
         {
-            Debug.Log("Game.SetGameMode");
             string gameModeName = Enum.GetName(typeof(GameModeName), gameMode);
+            Debug.Log(_instance.GetType().Name + " is about to set the game mode: " + gameModeName);
 
             Type type;
 
@@ -146,7 +146,7 @@ namespace GameplayFramework
                 GameMode = mode;
 
                 if(oldMode != null)
-                    oldMode.EndMode();
+                    oldMode.Dispose();
 
                 GameMode.BeginMode();
             }
@@ -173,7 +173,6 @@ namespace GameplayFramework
 
         public static void LoadScene(SceneName scene)
         {
-            Debug.Log("Game.LoadScene");
             _instance.LoadSceneImplementation(scene);
         }
 
@@ -185,6 +184,7 @@ namespace GameplayFramework
                     throw new InvalidOperationException("Only a single scene can be loaded at a time.");
 
                 string sceneName = Enum.GetName(typeof(SceneName), scene);
+                Debug.Log(_instance.GetType().Name + " is about to load a scene: " + sceneName);
 
                 var preLoadScene = ScenePreLoad;
                 if(preLoadScene != null)

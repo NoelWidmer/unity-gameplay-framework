@@ -3,12 +3,23 @@ using UnityEngine;
 
 namespace GameplayFramework
 {
-    public class GameMode
+    public class GameMode : IDisposable
     {
+        public GameMode()
+        {
+            Game.TickGameMode += Tick;
+        }
+
         public virtual void BeginMode()
         {
             Debug.Log("GameMode.BeginMode");
-            Game.TickGameMode += Tick;
+            SetGameState();
+        }
+
+
+
+        protected virtual void SetGameState()
+        {
             Game.GameState = new GameState();
         }
 
@@ -20,9 +31,8 @@ namespace GameplayFramework
 
 
 
-        public virtual void EndMode()
+        public virtual void Dispose()
         {
-            Debug.Log("GameMode.EndMode");
             Game.TickGameMode -= Tick;
         }
     }

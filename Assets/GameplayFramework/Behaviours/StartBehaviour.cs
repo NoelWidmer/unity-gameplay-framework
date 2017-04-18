@@ -82,7 +82,7 @@ namespace GameplayFramework
 
         protected virtual void StartGame(Game game)
         {
-            Debug.Log("StartBehaviour.StartGame");
+            Debug.Log(GetType().Name + " is starting the game.");
 
             // Initialize Game.
             Game.Initialize(game);
@@ -94,7 +94,7 @@ namespace GameplayFramework
         private void OnScenePreLoad()
         {
             Game.ScenePreLoad -= (sender, e) => OnScenePreLoad();
-            Game.SetGameMode(GameModeName.GameMode);
+            Game.SetGameMode(StartGameMode);
         }
         
         private void OnScenePostLoad()

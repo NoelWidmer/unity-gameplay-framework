@@ -2,7 +2,7 @@
 
 namespace GameplayFramework
 {
-    public class Pawn
+    public class Pawn : IDisposable
     {
         private readonly object _lock = new object();
         private Controller _controller;
@@ -61,6 +61,18 @@ namespace GameplayFramework
                 var becameUnossessed = BecameUnPossessed;
                 if(becameUnossessed != null)
                     becameUnossessed(this, EventArgs.Empty);
+            }
+        }
+
+
+
+        public virtual void Dispose()
+        {
+            Controller controller = _controller;
+            if(controller != null)
+            {
+                _controller.UnPossessedPawn -= (sender, e) => OnBecameUnPossessed();
+                _controller = null;
             }
         }
     }

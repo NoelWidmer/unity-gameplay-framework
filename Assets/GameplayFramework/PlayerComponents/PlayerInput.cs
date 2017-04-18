@@ -1,12 +1,14 @@
 ﻿using System;
+using UnityEngine;
 
 namespace GameplayFramework
 {
     public class PlayerInput : IDisposable
     {
-        public PlayerInput(bool tickEnabled = true)
+        public PlayerInput()
         {
-            TickEnabled = tickEnabled;
+            Debug.Log("Init input.");
+            TickEnabled = true;
         }
 
 
@@ -39,6 +41,12 @@ namespace GameplayFramework
 
 
         protected virtual void Tick(TickArgs e)
+        {
+        }
+
+
+
+        public virtual void Reset()
         {
         }
 

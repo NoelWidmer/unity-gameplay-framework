@@ -6,7 +6,7 @@ namespace GameplayFramework
     {
         public PlayerController()
         {
-            Initialize();
+            InitializePlayerComponents();
         }
 
 
@@ -31,11 +31,22 @@ namespace GameplayFramework
 
 
 
-        protected virtual void Initialize()
+        protected virtual void InitializePlayerComponents()
         {
             PlayerInput = new PlayerInput();
             PlayerCamera = new PlayerCamera();
             PlayerHUD = new PlayerHUD();
+        }
+
+
+
+        protected override void Tick(TickArgs e)
+        {
+            base.Tick(e);
+
+            PlayerInput playerInput = PlayerInput;
+            if(playerInput != null)
+                playerInput.Reset();
         }
 
 
