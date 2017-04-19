@@ -25,28 +25,21 @@ namespace GameplayFramework.Sample
         {
             base.Tick(e);
 
+            // Left Stick
             {
-                float leftStickX = Input.GetAxis("Joystick Axis, X Axis");
-                float leftStickY = Input.GetAxis("Joystick Axis, Y Axis");
+                float leftStickX = Input.GetAxis("LeftAxisX");
+                float leftStickY = Input.GetAxis("LeftAxisY");
                 LeftStick = new Vector2(leftStickX, leftStickY);
             }
 
+            // Right Stick
             {
-                float rightStickX = Input.GetAxis("Joystick Axis, 4th Axis");
-                float rightStickY = Input.GetAxis("Joystick Axis, 5th Axis");
+                float rightStickX = Input.GetAxis("RightAxisX");
+                float rightStickY = Input.GetAxis("RightAxisY");
                 RightStick = new Vector2(rightStickX, rightStickY);
             }
 
-            AButton = Input.GetKey("joystick button 0");
-        }
-
-        public override void Reset()
-        {
-            base.Reset();
-
-            LeftStick = Vector2.zero;
-            RightStick = Vector2.zero;
-            AButton = false;
+            AButton = Input.GetButton("AButton");
         }
     }
 }

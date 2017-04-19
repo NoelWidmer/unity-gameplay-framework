@@ -40,17 +40,6 @@ namespace GameplayFramework
 
 
 
-        protected override void Tick(TickArgs e)
-        {
-            base.Tick(e);
-
-            PlayerInput playerInput = PlayerInput;
-            if(playerInput != null)
-                playerInput.Reset();
-        }
-
-
-
         public override void Dispose()
         {
             base.Dispose();

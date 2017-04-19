@@ -46,12 +46,6 @@ namespace GameplayFramework
 
 
 
-        public virtual void Reset()
-        {
-        }
-
-
-
         public virtual void Dispose()
         {
             TickEnabled = false;

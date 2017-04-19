@@ -31,7 +31,7 @@ namespace GameplayFramework.Sample
         {
             base.Tick(e);
 
-            Debug.Log(PlayerInput.LeftStick);
+            Debug.Log(PlayerInput.RightStick);
         }
     }
 }
