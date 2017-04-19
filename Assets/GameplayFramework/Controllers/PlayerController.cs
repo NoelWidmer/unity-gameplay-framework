@@ -6,7 +6,9 @@ namespace GameplayFramework
     {
         public PlayerController()
         {
-            InitializePlayerComponents();
+            InitPlayerInput();
+            InitPlayerCamera();
+            InitPlayerHUD();
         }
 
 
@@ -31,11 +33,25 @@ namespace GameplayFramework
 
 
 
-        protected virtual void InitializePlayerComponents()
+        protected virtual void InitPlayerInput()
         {
             PlayerInput = new PlayerInput();
+        }
+
+        protected virtual void InitPlayerCamera()
+        {
             PlayerCamera = new PlayerCamera();
+        }
+
+        protected virtual void InitPlayerHUD()
+        {
             PlayerHUD = new PlayerHUD();
+        }
+
+
+
+        protected virtual void BeginPlay()
+        {
         }
 
 
@@ -43,13 +59,13 @@ namespace GameplayFramework
         public override void Dispose()
         {
             base.Dispose();
-            
+
             if(PlayerInput != null)
             {
                 PlayerInput.Dispose();
                 PlayerInput = null;
             }
-
+            
             if(PlayerCamera != null)
             {
                 PlayerCamera.Dispose();

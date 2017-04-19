@@ -18,11 +18,18 @@ namespace GameplayFramework.Sample
 
 
 
-        protected override void InitializePlayerComponents()
+        protected override void InitPlayerInput()
         {
             PlayerInput = new PlayerInputSample();
-            PlayerCamera = new PlayerCamera();
-            PlayerHUD = new PlayerHUD();
+        }
+
+
+
+        protected override void BeginPlay()
+        {
+            base.BeginPlay();
+
+
         }
 
 
