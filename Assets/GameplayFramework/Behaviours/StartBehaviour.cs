@@ -23,14 +23,10 @@ namespace GameplayFramework
 
         #endregion
 
+
+
         [SerializeField]
-        private SceneName _startScene;
-
-        [SerializeField]
-        private GameModeName _startGameMode;
-
-
-
+        private SceneName _startScene;        
         protected SceneName StartScene
         {
             get
@@ -39,6 +35,9 @@ namespace GameplayFramework
             }
         }
 
+
+        [SerializeField]
+        private GameModeName _startGameMode;
         protected GameModeName StartGameMode
         {
             get
@@ -57,7 +56,7 @@ namespace GameplayFramework
             var gf = new GameObject("GameplayFramework");
             DontDestroyOnLoad(gf);
 
-            Game game = InstatiateGame();
+            World world = GetNewWorld();
 
             // Create Anchor.
             {
@@ -65,41 +64,40 @@ namespace GameplayFramework
                 anchorGo.hideFlags = HideFlags.HideInHierarchy;
                 anchorGo.transform.parent = gf.transform;
                 Anchor anchor = anchorGo.AddComponent<Anchor>();
-                anchor.Game = game;
+                anchor.World = world;
             }
 
-            StartGame(game);
+            StartWorld(world);
         }
 
 
 
-        protected virtual Game InstatiateGame()
+        protected virtual World GetNewWorld()
         {
-            return new Game();
+            return World.BigBang<World>();
         }
 
 
 
-        protected virtual void StartGame(Game game)
+        protected virtual void StartWorld(World world)
         {
-            Debug.Log(GetType().Name + " is starting the game.");
+            Debug.Log(GetType().Name + " is starting the world.");
 
-            // Initialize Game.
-            Game.Initialize(game);
-            Game.ScenePostLoad += (sender, e) => OnScenePostLoad();
-            Game.ScenePreLoad += (sender, e) => OnScenePreLoad();
-            Game.LoadScene(StartScene);
+            // Initialize World.
+            World.ScenePostLoad += (sender, e) => OnScenePostLoad();
+            World.ScenePreLoad += (sender, e) => OnScenePreLoad();
+            World.LoadScene(StartScene);
         }
         
         private void OnScenePreLoad()
         {
-            Game.ScenePreLoad -= (sender, e) => OnScenePreLoad();
-            Game.SetGameMode(StartGameMode);
+            World.ScenePreLoad -= (sender, e) => OnScenePreLoad();
+            World.SetGameMode(StartGameMode);
         }
         
         private void OnScenePostLoad()
         {
-            Game.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();
+            World.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();
             Destroy(gameObject);
         }
     }

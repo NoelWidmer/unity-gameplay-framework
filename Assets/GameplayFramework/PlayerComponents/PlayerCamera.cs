@@ -25,11 +25,11 @@ namespace GameplayFramework
 
                 if(value)
                 {
-                    Game.TickPlayerCamera += Tick;
+                    World.TickPlayerCamera += Tick;
                 }
                 else
                 {
-                    Game.TickPlayerCamera -= Tick;
+                    World.TickPlayerCamera -= Tick;
                 }
 
                 _tickEnabled = value;

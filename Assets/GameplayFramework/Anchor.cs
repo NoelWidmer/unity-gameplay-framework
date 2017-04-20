@@ -23,7 +23,7 @@ namespace GameplayFramework
 
         #endregion
 
-        public Game Game
+        public World World
         {
             get;
             set;
@@ -31,12 +31,12 @@ namespace GameplayFramework
 
         protected virtual void Update()
         {
-            Game.OnUnityUpdate();
+            World.OnUnityUpdate();
         }
 
         protected virtual void FixedUpdate()
         {
-            Game.OnUnityFixedUpdate();
+            World.OnUnityFixedUpdate();
         }
     }
 }

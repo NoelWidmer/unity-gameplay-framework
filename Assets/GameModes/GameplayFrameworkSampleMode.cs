@@ -6,7 +6,7 @@ namespace GameplayFramework.Sample
     {
         protected override void SetGameState()
         {
-            Game.GameState = new GameStateSample();
+            World.GameState = new GameStateSample();
         }
 
 

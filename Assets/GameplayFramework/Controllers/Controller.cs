@@ -80,11 +80,11 @@ namespace GameplayFramework
 
                 if(value)
                 {
-                    Game.TickControllers += Tick;
+                    World.TickControllers += Tick;
                 }
                 else
                 {
-                    Game.TickControllers -= Tick;
+                    World.TickControllers -= Tick;
                 }
 
                 _tickEnabled = value;

@@ -27,11 +27,11 @@ namespace GameplayFramework
 
                 if(value)
                 {
-                    Game.TickPlayerInput += Tick;
+                    World.TickPlayerInput += Tick;
                 }
                 else
                 {
-                    Game.TickPlayerInput -= Tick;
+                    World.TickPlayerInput -= Tick;
                 }
 
                 _tickEnabled = value;

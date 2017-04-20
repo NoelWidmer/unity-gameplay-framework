@@ -7,31 +7,45 @@ using UnityEngine.SceneManagement;
 
 namespace GameplayFramework
 {
-    public class Game
+    public class World
     {
         #region Singleton
 
-        private static readonly object _instanceLock = new object();
-        private static Game _instance;
+        private static readonly object _bigBangLock = new object();
+        private static World _instance;
 
 
-        public static void Initialize(Game game)
+        public static T BigBang<T>() where T : World, new()
         {
-            Debug.Log(game.GetType().Name + " initializes.");
+            T world = new T();
 
-            if(game == null)
-                throw new ArgumentNullException("game");
+            Debug.Log("Big Bang: " + typeof(T).Name);
 
-            lock(_instanceLock)
+            lock(_bigBangLock)
             {
                 if(_instance != null)
-                    throw new InvalidOperationException("The '" + typeof(Game).Name + "' can only be initialized once.");
+                    throw new InvalidOperationException("Only a single '" + typeof(World).Name + "' can exist.");
 
-                _instance = game;
+                _instance = world;
             }
 
-            _normalWatch.Start();            
-            _fixedWatch.Start();
+            TickWatch.Start();            
+            TickFixedWatch.Start();
+
+            return world;
+        }
+
+        #endregion
+
+        #region Time
+
+        protected static readonly System.Diagnostics.Stopwatch TickWatch = new System.Diagnostics.Stopwatch();
+        protected static readonly System.Diagnostics.Stopwatch TickFixedWatch = new System.Diagnostics.Stopwatch();
+
+        public static float PlayTime
+        {
+            get;
+            protected set;
         }
 
         #endregion
@@ -49,23 +63,93 @@ namespace GameplayFramework
 
 
 
+        public virtual void OnUnityUpdate()
+        {
+            float deltaTime = TickWatch.Elapsed.Milliseconds / 1000f;
+            TickWatch.Reset();
+
+            TickArgs tickArgs = new TickArgs(deltaTime);
+            PlayTime += deltaTime;
+
+            RaiseTickInput(tickArgs);
+            RaiseTickControl(tickArgs);
+            RaiseTickActor(tickArgs);
+            RaiseTickCamera(tickArgs);
+            RaiseTickHUD(tickArgs);
+            RaiseTickMode(tickArgs);
+
+            Tick(tickArgs);
+        }
+
+        public virtual void OnUnityFixedUpdate()
+        {
+            float deltaTime = TickFixedWatch.Elapsed.Milliseconds / 1000f;
+            TickFixedWatch.Reset();
+
+            TickArgs tickArgs = new TickArgs(deltaTime);
+
+            RaiseTickFixed(tickArgs);
+        }
+
         protected virtual void Tick(TickArgs e)
         {
             CheckLoadSceneCompletion();
         }
 
-        #endregion
+        #region Raise Events
 
-        #region Time
-
-        private static readonly System.Diagnostics.Stopwatch _normalWatch = new System.Diagnostics.Stopwatch();
-        private static readonly System.Diagnostics.Stopwatch _fixedWatch = new System.Diagnostics.Stopwatch();
-
-        public static float PlayTime
+        protected virtual void RaiseTickInput(TickArgs e)
         {
-            get;
-            protected set;
+            var tickInput = TickPlayerInput;
+            if(tickInput != null)
+                tickInput(e);
         }
+
+        protected virtual void RaiseTickControl(TickArgs e)
+        {
+            var tickControl = TickControllers;
+            if(tickControl != null)
+                tickControl(e);
+        }
+
+        protected virtual void RaiseTickActor(TickArgs e)
+        {
+            var tickActor = TickActor;
+            if(tickActor != null)
+                tickActor(e);
+        }
+
+        protected virtual void RaiseTickCamera(TickArgs e)
+        {
+            var tickCamera = TickPlayerCamera;
+            if(tickCamera != null)
+                tickCamera(e);
+        }
+
+        protected virtual void RaiseTickHUD(TickArgs e)
+        {
+            var tickHUD = TickPlayerHUD;
+            if(tickHUD != null)
+                tickHUD(e);
+        }
+
+        protected virtual void RaiseTickMode(TickArgs e)
+        {
+            var tickMode = TickGameMode;
+            if(tickMode != null)
+                tickMode(e);
+        }
+
+
+
+        protected virtual void RaiseTickFixed(TickArgs e)
+        {
+            var tickFixed = TickFixed;
+            if(tickFixed != null)
+                tickFixed(e);
+        }
+
+        #endregion
 
         #endregion
 
@@ -215,71 +299,6 @@ namespace GameplayFramework
                     if(postLoadScene != null)
                         postLoadScene(null, EventArgs.Empty);
                 }
-            }
-        }
-
-        #endregion
-
-        #region Unity Callbacks
-
-        public virtual void OnUnityUpdate()
-        {
-            float deltaTime = _normalWatch.Elapsed.Milliseconds / 1000f;
-            _normalWatch.Reset();
-
-            TickArgs tickArgs = new TickArgs(deltaTime);
-            PlayTime += deltaTime;
-
-            {
-                var tickInput = TickPlayerInput;
-                if(tickInput != null)
-                    tickInput(tickArgs);
-            }
-
-            {
-                var tickControl = TickControllers;
-                if(tickControl != null)
-                    tickControl(tickArgs);
-            }
-
-            {
-                var tickActor = TickActor;
-                if(tickActor != null)
-                    tickActor(tickArgs);
-            }
-
-            {
-                var tickCamera = TickPlayerCamera;
-                if(tickCamera != null)
-                    tickCamera(tickArgs);
-            }
-
-            {
-                var tickHUD = TickPlayerHUD;
-                if(tickHUD != null)
-                    tickHUD(tickArgs);
-            }
-
-            {
-                var tickMode = TickGameMode;
-                if(tickMode != null)
-                    tickMode(tickArgs);
-            }
-
-            Tick(tickArgs);
-        }
-
-        public virtual void OnUnityFixedUpdate()
-        {
-            float deltaTime = _fixedWatch.Elapsed.Milliseconds / 1000f;
-            _normalWatch.Reset();
-
-            TickArgs tickArgs = new TickArgs(deltaTime);
-
-            {
-                var tickFixed = TickFixed;
-                if(tickFixed != null)
-                    tickFixed(tickArgs);
             }
         }
 
