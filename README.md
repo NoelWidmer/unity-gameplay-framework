@@ -8,4 +8,8 @@ I have some knowledge about the Unreal Engine Gameplay Framework which I really 
 
 ## The Gameplay Framework Classes
 
-Content coming soon
+The GF consist of a few classes that help to structure gameplay logic.
+
+![Class Relationship Diagram](./docs/ClassRelationshipDiagram.png)
+
+More content coming soon
