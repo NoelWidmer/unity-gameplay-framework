@@ -2,13 +2,6 @@
 {
     public class PlayerCameraManager : PlayerManager
     {
-        public PlayerCameraManager(bool tickEnabled = true)
-        {
-            TickEnabled = tickEnabled;
-        }
-
-
-
         protected sealed override void AddTickHandler(TickHandler handler)
         {
             Game.TickPlayerCamera += handler;

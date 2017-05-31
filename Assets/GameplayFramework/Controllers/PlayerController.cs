@@ -34,16 +34,19 @@
         protected virtual void InitPlayerInputManager()
         {
             PlayerInputManager = new PlayerInputManager();
+            PlayerInputManager.TickEnabled = true;
         }
 
         protected virtual void InitPlayerCameraManager()
         {
             PlayerCameraManager = new PlayerCameraManager();
+            PlayerCameraManager.TickEnabled = true;
         }
 
         protected virtual void InitPlayerHUDManager()
         {
             PlayerHUDManager = new PlayerHUDManager();
+            PlayerHUDManager.TickEnabled = true;
         }
 
 

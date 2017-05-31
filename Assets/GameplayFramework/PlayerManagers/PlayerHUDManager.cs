@@ -2,13 +2,6 @@
 {
     public class PlayerHUDManager : PlayerManager
     {
-        public PlayerHUDManager(bool tickEnabled = true)
-        {
-            TickEnabled = tickEnabled;
-        }
-
-
-
         protected sealed override void AddTickHandler(TickHandler handler)
         {
             Game.TickPlayerHUD += handler;
