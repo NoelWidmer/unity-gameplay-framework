@@ -1,54 +1,28 @@
-﻿using System;
-using UnityEngine;
-
-namespace GameplayFramework
+﻿namespace GameplayFramework
 {
-    public class PlayerInputManager : IDisposable
+    public class PlayerInputManager : PlayerManager
     {
         public PlayerInputManager()
         {
-            Debug.Log("Init input.");
             TickEnabled = true;
         }
 
 
 
-        private bool _tickEnabled = false;
-        public bool TickEnabled
+        protected sealed override void AddTickHandler(TickHandler handler)
         {
-            get
-            {
-                return _tickEnabled;
-            }
-            set
-            {
-                if(value == _tickEnabled)
-                    return;
+            Game.TickPlayerInput += handler;
+        }
 
-                if(value)
-                {
-                    Game.TickPlayerInput += Tick;
-                }
-                else
-                {
-                    Game.TickPlayerInput -= Tick;
-                }
-
-                _tickEnabled = value;
-            }
+        protected sealed override void RemoveTickHandler(TickHandler handler)
+        {
+            Game.TickPlayerInput -= handler;
         }
 
 
 
-        protected virtual void Tick(TickArgs e)
+        protected override void Tick(TickArgs e)
         {
-        }
-
-
-
-        public virtual void Dispose()
-        {
-            TickEnabled = false;
         }
     }
 }

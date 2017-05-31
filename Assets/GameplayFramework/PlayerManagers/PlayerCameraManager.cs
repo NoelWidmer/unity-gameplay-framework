@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace GameplayFramework
+﻿namespace GameplayFramework
 {
-    public class PlayerCameraManager : IDisposable
+    public class PlayerCameraManager : PlayerManager
     {
         public PlayerCameraManager(bool tickEnabled = true)
         {
@@ -11,42 +9,20 @@ namespace GameplayFramework
 
 
 
-        private bool _tickEnabled = false;
-        public bool TickEnabled
+        protected sealed override void AddTickHandler(TickHandler handler)
         {
-            get
-            {
-                return _tickEnabled;
-            }
-            set
-            {
-                if(value == _tickEnabled)
-                    return;
+            Game.TickPlayerCamera += handler;
+        }
 
-                if(value)
-                {
-                    Game.TickPlayerCamera += Tick;
-                }
-                else
-                {
-                    Game.TickPlayerCamera -= Tick;
-                }
-
-                _tickEnabled = value;
-            }
+        protected sealed override void RemoveTickHandler(TickHandler handler)
+        {
+            Game.TickPlayerCamera -= handler;
         }
 
 
 
-        protected virtual void Tick(TickArgs e)
+        protected override void Tick(TickArgs e)
         {
-        }
-
-
-
-        public virtual void Dispose()
-        {
-            TickEnabled = false;
         }
     }
 }

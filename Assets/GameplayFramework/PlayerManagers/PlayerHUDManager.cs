@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace GameplayFramework
+﻿namespace GameplayFramework
 {
-    public class PlayerHUDManager : IDisposable
+    public class PlayerHUDManager : PlayerManager
     {
         public PlayerHUDManager(bool tickEnabled = true)
         {
@@ -11,42 +9,20 @@ namespace GameplayFramework
 
 
 
-        private bool _tickEnabled = false;
-        public bool TickEnabled
+        protected sealed override void AddTickHandler(TickHandler handler)
         {
-            get
-            {
-                return _tickEnabled;
-            }
-            set
-            {
-                if(value == _tickEnabled)
-                    return;
+            Game.TickPlayerHUD += handler;
+        }
 
-                if(value)
-                {
-                    Game.TickPlayerHUD += Tick;
-                }
-                else
-                {
-                    Game.TickPlayerHUD -= Tick;
-                }
-
-                _tickEnabled = value;
-            }
+        protected sealed override void RemoveTickHandler(TickHandler handler)
+        {
+            Game.TickPlayerHUD -= handler;
         }
 
 
 
-        protected virtual void Tick(TickArgs e)
+        protected override void Tick(TickArgs e)
         {
-        }
-
-
-
-        public virtual void Dispose()
-        {
-            TickEnabled = false;
         }
     }
 }
