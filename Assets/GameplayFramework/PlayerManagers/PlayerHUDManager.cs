@@ -2,9 +2,9 @@
 
 namespace GameplayFramework
 {
-    public class PlayerHUD : IDisposable
+    public class PlayerHUDManager : IDisposable
     {
-        public PlayerHUD(bool tickEnabled = true)
+        public PlayerHUDManager(bool tickEnabled = true)
         {
             TickEnabled = tickEnabled;
         }
@@ -25,11 +25,11 @@ namespace GameplayFramework
 
                 if(value)
                 {
-                    World.TickPlayerHUD += Tick;
+                    Game.TickPlayerHUD += Tick;
                 }
                 else
                 {
-                    World.TickPlayerHUD -= Tick;
+                    Game.TickPlayerHUD -= Tick;
                 }
 
                 _tickEnabled = value;

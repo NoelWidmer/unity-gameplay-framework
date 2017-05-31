@@ -1,11 +1,14 @@
 ﻿using System;
+using UnityEngine;
 
 namespace GameplayFramework
 {
-    public class Pawn : IDisposable
+    public class MonoPawn : MonoBehaviour, IPawn, IDisposable
     {
         private readonly object _lock = new object();
         private Controller _controller;
+
+
 
         public Controller Controller
         {
@@ -31,7 +34,7 @@ namespace GameplayFramework
             {
                 if(_controller != null)
                 {
-                    if(_controller.GetHashCode() == controller.GetHashCode())
+                    if(_controller.Equals(controller))
                         return;
 
                     _controller.UnPossess();
@@ -40,11 +43,12 @@ namespace GameplayFramework
                 _controller = controller;
                 controller.UnPossessedPawn += (sender, e) => OnBecameUnPossessed();
 
-                var becamePossessed = BecamePossessed;
+                EventHandler becamePossessed = BecamePossessed;
                 if(becamePossessed != null)
                     becamePossessed(this, EventArgs.Empty);
             }
         }
+
 
 
         protected virtual void OnBecameUnPossessed()
@@ -53,12 +57,11 @@ namespace GameplayFramework
             {
                 if(_controller == null)
                     return;
-
-                Controller oldController = _controller;
-                _controller = null;
+                
                 _controller.UnPossessedPawn -= (sender, e) => OnBecameUnPossessed();
+                _controller = null;
 
-                var becameUnossessed = BecameUnPossessed;
+                EventHandler becameUnossessed = BecameUnPossessed;
                 if(becameUnossessed != null)
                     becameUnossessed(this, EventArgs.Empty);
             }
@@ -68,12 +71,21 @@ namespace GameplayFramework
 
         public virtual void Dispose()
         {
-            Controller controller = _controller;
-            if(controller != null)
+            lock(_lock)
             {
-                _controller.UnPossessedPawn -= (sender, e) => OnBecameUnPossessed();
-                _controller = null;
+                if(_controller != null)
+                {
+                    _controller.UnPossessedPawn -= (sender, e) => OnBecameUnPossessed();
+                    _controller = null;
+                }
             }
+        }
+
+
+
+        private void OnDestroy()
+        {
+            Dispose();
         }
     }
 }

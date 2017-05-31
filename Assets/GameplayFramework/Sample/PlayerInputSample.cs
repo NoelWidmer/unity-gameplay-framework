@@ -2,7 +2,7 @@
 
 namespace GameplayFramework.Sample
 {
-    public class PlayerInputSample : PlayerInput
+    public class PlayerInputSample : PlayerInputManager
     {
         public Vector2 LeftStick
         {

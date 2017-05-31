@@ -10,36 +10,44 @@ namespace GameplayFramework
         }
 
 
+
+        private IPawn _pawn;
         
-        public Pawn Pawn
+        public IPawn Pawn
         {
-            get;
-            protected set;
+            get
+            {
+                return _pawn;
+            }
         }
+
+
 
         #region Possess & UnPossess
 
         private readonly object _possessionLock = new object();
+
+
 
         public event EventHandler PossessedPawn;
         public event EventHandler UnPossessedPawn;
 
 
 
-        public virtual void Possess(Pawn pawn)
+        public virtual void Possess(IPawn pawn)
         {
             if(pawn == null)
                 throw new ArgumentNullException("pawn");
 
             lock(_possessionLock)
             {
-                if(Pawn != null)
+                if(_pawn != null)
                     UnPossess();
 
-                Pawn = pawn;
+                _pawn = pawn;
                 pawn.OnBecamePossessed(this);
 
-                var possessedPawn = PossessedPawn;
+                EventHandler possessedPawn = PossessedPawn;
                 if(possessedPawn != null)
                     possessedPawn(this, EventArgs.Empty);
             }
@@ -51,12 +59,12 @@ namespace GameplayFramework
         {
             lock(_possessionLock)
             {
-                if(Pawn == null)
+                if(_pawn == null)
                     return;
-                
-                Pawn = null;
 
-                var unPossessedPawn = UnPossessedPawn;
+                _pawn = null;
+
+                EventHandler unPossessedPawn = UnPossessedPawn;
                 if(unPossessedPawn != null)
                     unPossessedPawn(this, EventArgs.Empty);
             }
@@ -79,21 +87,19 @@ namespace GameplayFramework
                     return;
 
                 if(value)
-                {
-                    World.TickControllers += Tick;
-                }
+                    Game.TickControllers += Tick;
                 else
-                {
-                    World.TickControllers -= Tick;
-                }
+                    Game.TickControllers -= Tick;
 
                 _tickEnabled = value;
             }
         }
 
-        protected virtual void Tick(TickArgs e)
-        {
-        }
+
+
+        protected abstract void Tick(TickArgs e);
+
+
 
         public virtual void Dispose()
         {

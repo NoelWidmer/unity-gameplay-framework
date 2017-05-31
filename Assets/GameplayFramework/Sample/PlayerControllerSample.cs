@@ -8,17 +8,17 @@ namespace GameplayFramework.Sample
         {
             get
             {
-                return (PlayerInputSample)base.PlayerInput;
+                return (PlayerInputSample)base.PlayerInputManager;
             }
             set
             {
-                base.PlayerInput = value;
+                base.PlayerInputManager = value;
             }
         }
 
 
 
-        protected override void InitPlayerInput()
+        protected override void InitPlayerInputManager()
         {
             PlayerInput = new PlayerInputSample();
         }

@@ -7,7 +7,7 @@ namespace GameplayFramework
     {
         public GameMode()
         {
-            World.TickGameMode += Tick;
+            Game.TickGameMode += Tick;
         }
 
         public virtual void BeginMode()
@@ -20,7 +20,7 @@ namespace GameplayFramework
 
         protected virtual void SetGameState()
         {
-            World.GameState = new GameState();
+            Game.GameState = new GameState();
         }
 
 
@@ -33,7 +33,7 @@ namespace GameplayFramework
 
         public virtual void Dispose()
         {
-            World.TickGameMode -= Tick;
+            Game.TickGameMode -= Tick;
         }
     }
 }

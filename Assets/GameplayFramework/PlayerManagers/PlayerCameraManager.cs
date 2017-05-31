@@ -2,9 +2,9 @@
 
 namespace GameplayFramework
 {
-    public class PlayerCamera : IDisposable
+    public class PlayerCameraManager : IDisposable
     {
-        public PlayerCamera(bool tickEnabled = true)
+        public PlayerCameraManager(bool tickEnabled = true)
         {
             TickEnabled = tickEnabled;
         }
@@ -25,11 +25,11 @@ namespace GameplayFramework
 
                 if(value)
                 {
-                    World.TickPlayerCamera += Tick;
+                    Game.TickPlayerCamera += Tick;
                 }
                 else
                 {
-                    World.TickPlayerCamera -= Tick;
+                    Game.TickPlayerCamera -= Tick;
                 }
 
                 _tickEnabled = value;

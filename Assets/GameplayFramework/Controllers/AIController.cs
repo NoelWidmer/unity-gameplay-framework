@@ -1,8 +1,9 @@
-﻿using UnityEngine;
-
-namespace GameplayFramework
+﻿namespace GameplayFramework
 {
     public class AIController : Controller
     {
+        protected override void Tick(TickArgs e)
+        {
+        }
     }
 }

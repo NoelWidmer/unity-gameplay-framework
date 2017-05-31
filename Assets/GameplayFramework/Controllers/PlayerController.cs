@@ -1,31 +1,29 @@
-﻿using System;
-
-namespace GameplayFramework
+﻿namespace GameplayFramework
 {
     public class PlayerController : Controller
     {
         public PlayerController()
         {
-            InitPlayerInput();
-            InitPlayerCamera();
-            InitPlayerHUD();
+            InitPlayerInputManager();
+            InitPlayerCameraManager();
+            InitPlayerHUDManager();
         }
 
 
         
-        public PlayerInput PlayerInput
+        public PlayerInputManager PlayerInputManager
         {
             get;
             protected set;
         }
         
-        public PlayerCamera PlayerCamera
+        public PlayerCameraManager PlayerCameraManager
         {
             get;
             protected set;
         }
         
-        public PlayerHUD PlayerHUD
+        public PlayerHUDManager PlayerHUDManager
         {
             get;
             protected set;
@@ -33,19 +31,19 @@ namespace GameplayFramework
 
 
 
-        protected virtual void InitPlayerInput()
+        protected virtual void InitPlayerInputManager()
         {
-            PlayerInput = new PlayerInput();
+            PlayerInputManager = new PlayerInputManager();
         }
 
-        protected virtual void InitPlayerCamera()
+        protected virtual void InitPlayerCameraManager()
         {
-            PlayerCamera = new PlayerCamera();
+            PlayerCameraManager = new PlayerCameraManager();
         }
 
-        protected virtual void InitPlayerHUD()
+        protected virtual void InitPlayerHUDManager()
         {
-            PlayerHUD = new PlayerHUD();
+            PlayerHUDManager = new PlayerHUDManager();
         }
 
 
@@ -56,26 +54,32 @@ namespace GameplayFramework
 
 
 
+        protected override void Tick(TickArgs e)
+        {
+        }
+
+
+
         public override void Dispose()
         {
             base.Dispose();
 
-            if(PlayerInput != null)
+            if(PlayerInputManager != null)
             {
-                PlayerInput.Dispose();
-                PlayerInput = null;
+                PlayerInputManager.Dispose();
+                PlayerInputManager = null;
             }
             
-            if(PlayerCamera != null)
+            if(PlayerCameraManager != null)
             {
-                PlayerCamera.Dispose();
-                PlayerCamera = null;
+                PlayerCameraManager.Dispose();
+                PlayerCameraManager = null;
             }
 
-            if(PlayerHUD != null)
+            if(PlayerHUDManager != null)
             {
-                PlayerHUD.Dispose();
-                PlayerHUD = null;
+                PlayerHUDManager.Dispose();
+                PlayerHUDManager = null;
             }
         }
     }

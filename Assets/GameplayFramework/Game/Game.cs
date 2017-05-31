@@ -7,15 +7,15 @@ using UnityEngine.SceneManagement;
 
 namespace GameplayFramework
 {
-    public class World
+    public class Game
     {
         #region Singleton
 
         private static readonly object _bigBangLock = new object();
-        private static World _instance;
+        private static Game _instance;
 
 
-        public static T BigBang<T>() where T : World, new()
+        public static T BigBang<T>() where T : Game, new()
         {
             T world = new T();
 
@@ -24,7 +24,7 @@ namespace GameplayFramework
             lock(_bigBangLock)
             {
                 if(_instance != null)
-                    throw new InvalidOperationException("Only a single '" + typeof(World).Name + "' can exist.");
+                    throw new InvalidOperationException("Only a single '" + typeof(Game).Name + "' can exist.");
 
                 _instance = world;
             }

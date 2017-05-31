@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace GameplayFramework
 {
-    public class PlayerInput : IDisposable
+    public class PlayerInputManager : IDisposable
     {
-        public PlayerInput()
+        public PlayerInputManager()
         {
             Debug.Log("Init input.");
             TickEnabled = true;
@@ -27,11 +27,11 @@ namespace GameplayFramework
 
                 if(value)
                 {
-                    World.TickPlayerInput += Tick;
+                    Game.TickPlayerInput += Tick;
                 }
                 else
                 {
-                    World.TickPlayerInput -= Tick;
+                    Game.TickPlayerInput -= Tick;
                 }
 
                 _tickEnabled = value;

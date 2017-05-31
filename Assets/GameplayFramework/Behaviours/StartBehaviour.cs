@@ -56,7 +56,7 @@ namespace GameplayFramework
             var gf = new GameObject("GameplayFramework");
             DontDestroyOnLoad(gf);
 
-            World world = GetNewWorld();
+            Game world = GetNewWorld();
 
             // Create Anchor.
             {
@@ -72,32 +72,32 @@ namespace GameplayFramework
 
 
 
-        protected virtual World GetNewWorld()
+        protected virtual Game GetNewWorld()
         {
-            return World.BigBang<World>();
+            return Game.BigBang<Game>();
         }
 
 
 
-        protected virtual void StartWorld(World world)
+        protected virtual void StartWorld(Game world)
         {
             Debug.Log(GetType().Name + " is starting the world.");
 
             // Initialize World.
-            World.ScenePostLoad += (sender, e) => OnScenePostLoad();
-            World.ScenePreLoad += (sender, e) => OnScenePreLoad();
-            World.LoadScene(StartScene);
+            Game.ScenePostLoad += (sender, e) => OnScenePostLoad();
+            Game.ScenePreLoad += (sender, e) => OnScenePreLoad();
+            Game.LoadScene(StartScene);
         }
         
         private void OnScenePreLoad()
         {
-            World.ScenePreLoad -= (sender, e) => OnScenePreLoad();
-            World.SetGameMode(StartGameMode);
+            Game.ScenePreLoad -= (sender, e) => OnScenePreLoad();
+            Game.SetGameMode(StartGameMode);
         }
         
         private void OnScenePostLoad()
         {
-            World.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();
+            Game.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();
             Destroy(gameObject);
         }
     }

@@ -23,7 +23,7 @@ namespace GameplayFramework
 
         #endregion
 
-        public World World
+        public Game World
         {
             get;
             set;
