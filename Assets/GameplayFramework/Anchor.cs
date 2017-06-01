@@ -1,29 +1,8 @@
-﻿using System;
-using UnityEngine;
-
-namespace GameplayFramework
+﻿namespace GameplayFramework
 {
-    public class Anchor : MonoBehaviour
+    public class Anchor : MonoSingleton
     {
-        #region Singleton
-
-        private static readonly object _instanceLock = new object();
-        private static Anchor _instance;
-
-        public Anchor()
-        {
-            lock(_instanceLock)
-            {
-                if(_instance != null)
-                    throw new InvalidOperationException("The '" + typeof(Anchor).Name + "' can only be instanciated once.");
-
-                _instance = this;
-            }
-        }
-
-        #endregion
-
-        public Game World
+        public Game Game
         {
             get;
             set;
@@ -31,12 +10,12 @@ namespace GameplayFramework
 
         protected virtual void Update()
         {
-            World.OnUnityUpdate();
+            Game.OnUnityUpdate();
         }
 
         protected virtual void FixedUpdate()
         {
-            World.OnUnityFixedUpdate();
+            Game.OnUnityFixedUpdate();
         }
     }
 }

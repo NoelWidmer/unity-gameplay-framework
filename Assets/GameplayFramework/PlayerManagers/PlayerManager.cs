@@ -3,7 +3,7 @@ using GameplayFramework;
 
 public abstract class PlayerManager : IDisposable
 {
-    private readonly object _lock = new object();
+    private readonly object _tickLock = new object();
 
 
 
@@ -16,7 +16,7 @@ public abstract class PlayerManager : IDisposable
         }
         set
         {
-            lock(_lock)
+            lock(_tickLock)
             {
                 if(value == _tickEnabled)
                     return;

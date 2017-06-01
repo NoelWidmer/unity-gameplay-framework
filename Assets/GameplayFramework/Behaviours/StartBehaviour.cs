@@ -1,48 +1,39 @@
-﻿using System;
+﻿using InspectorReflector;
 using UnityEngine;
 
 namespace GameplayFramework
 {
-    public class StartBehaviour : MonoBehaviour
+    [EnableIR]
+    public class StartBehaviour : MonoSingleton
     {
-        #region Singleton
-
-        private static readonly object _instanceLock = new object();
-        private static StartBehaviour _instance;
-
-        public StartBehaviour()
-        {
-            lock(_instanceLock)
-            {
-                if(_instance != null)
-                    throw new InvalidOperationException("The '" + typeof(StartBehaviour).Name + "' can only be instanciated once.");
-
-                _instance = this;
-            }
-        }
-
-        #endregion
-
-
-
         [SerializeField]
-        private SceneName _startScene;        
-        protected SceneName StartScene
+        private SceneName _startScene;
+        [Inspect]
+        public SceneName StartScene
         {
             get
             {
                 return _startScene;
+            }
+            set
+            {
+                _startScene = value;
             }
         }
 
 
         [SerializeField]
         private GameModeName _startGameMode;
+        [Inspect]
         protected GameModeName StartGameMode
         {
             get
             {
                 return _startGameMode;
+            }
+            set
+            {
+                _startGameMode = value;
             }
         }
 
@@ -53,39 +44,37 @@ namespace GameplayFramework
             DontDestroyOnLoad(this);
 
             // Create root GO.
-            var gf = new GameObject("GameplayFramework");
-            DontDestroyOnLoad(gf);
+            DontDestroyOnLoad(gameObject);
+            gameObject.name = "GameplayFramework";
 
-            Game world = GetNewWorld();
+            Game game = CreateNewGame();
 
             // Create Anchor.
             {
                 var anchorGo = new GameObject("Anchor");
                 anchorGo.hideFlags = HideFlags.HideInHierarchy;
-                anchorGo.transform.parent = gf.transform;
+                anchorGo.transform.parent = gameObject.transform;
                 Anchor anchor = anchorGo.AddComponent<Anchor>();
-                anchor.World = world;
+                anchor.Game = game;
             }
 
-            StartWorld(world);
+            StartGame(game);
         }
 
 
 
-        protected virtual Game GetNewWorld()
+        protected virtual Game CreateNewGame()
         {
-            return Game.BigBang<Game>();
+            return Game.CreateNew<Game>();
         }
 
 
 
-        protected virtual void StartWorld(Game world)
+        protected virtual void StartGame(Game game)
         {
-            Debug.Log(GetType().Name + " is starting the world.");
-
-            // Initialize World.
-            Game.ScenePostLoad += (sender, e) => OnScenePostLoad();
+            // Initialize Game.
             Game.ScenePreLoad += (sender, e) => OnScenePreLoad();
+            Game.ScenePostLoad += (sender, e) => OnScenePostLoad();
             Game.LoadScene(StartScene);
         }
         
@@ -98,7 +87,7 @@ namespace GameplayFramework
         private void OnScenePostLoad()
         {
             Game.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();
-            Destroy(gameObject);
+            Destroy(this);
         }
     }
 }

@@ -11,28 +11,27 @@ namespace GameplayFramework
     {
         #region Singleton
 
-        private static readonly object _bigBangLock = new object();
+        private static readonly object _createLock = new object();
         private static Game _instance;
 
 
-        public static T BigBang<T>() where T : Game, new()
+
+        public static T CreateNew<T>() where T : Game, new()
         {
-            T world = new T();
+            T game = new T();
 
-            Debug.Log("Big Bang: " + typeof(T).Name);
-
-            lock(_bigBangLock)
+            lock(_createLock)
             {
                 if(_instance != null)
                     throw new InvalidOperationException("Only a single '" + typeof(Game).Name + "' can exist.");
 
-                _instance = world;
+                _instance = game;
             }
 
             TickWatch.Start();            
             TickFixedWatch.Start();
 
-            return world;
+            return game;
         }
 
         #endregion
