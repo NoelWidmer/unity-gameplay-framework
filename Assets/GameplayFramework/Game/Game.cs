@@ -16,22 +16,30 @@ namespace GameplayFramework
 
 
 
-        public static T CreateNew<T>() where T : Game, new()
+        public static Game Current
+        {
+            get
+            {
+                return _instance;
+            }
+        }
+
+
+
+        public static void StartNew<T>() where T : Game, new()
         {
             T game = new T();
 
             lock(_createLock)
             {
                 if(_instance != null)
-                    throw new InvalidOperationException("Only a single '" + typeof(Game).Name + "' can exist.");
+                    throw new InvalidOperationException("Only a single '" + typeof(Game).Name + "' can be started.");
 
                 _instance = game;
             }
 
             TickWatch.Start();            
             TickFixedWatch.Start();
-
-            return game;
         }
 
         #endregion
@@ -162,10 +170,9 @@ namespace GameplayFramework
             protected set;
         }
 
-        public static void SetGameMode(GameModeName gameMode)
+        public void SetGameMode(GameModeName gameMode)
         {
             string gameModeName = Enum.GetName(typeof(GameModeName), gameMode);
-            Debug.Log(_instance.GetType().Name + " is about to set the game mode: " + gameModeName);
 
             Type type;
 
@@ -214,10 +221,10 @@ namespace GameplayFramework
             }
         }
 
-        public static void SetGameMode<T>() where T : GameMode, new()
+        public virtual void SetGameMode<T>() where T : GameMode, new()
         {
-            Debug.Log("Game.SetGameMode");
-            _instance.SetGameMode(new T());
+            var mode = new T();
+            SetGameMode(mode);
         }
 
         protected virtual void SetGameMode(GameMode mode)
@@ -254,12 +261,7 @@ namespace GameplayFramework
         public static event EventHandler SceneLoadBegin;
         public static event EventHandler ScenePostLoad;
 
-        public static void LoadScene(SceneName scene)
-        {
-            _instance.LoadSceneImplementation(scene);
-        }
-
-        protected virtual void LoadSceneImplementation(SceneName scene)
+        public virtual void LoadScene(SceneName scene)
         {
             lock(_sceneLock)
             {
@@ -302,5 +304,12 @@ namespace GameplayFramework
         }
 
         #endregion
+
+
+
+        public void Destroy()
+        {
+            _instance = null;
+        }
     }
 }

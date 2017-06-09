@@ -21,11 +21,10 @@ namespace GameplayFramework
             }
         }
 
-
         [SerializeField]
         private GameModeName _startGameMode;
         [Inspect]
-        protected GameModeName StartGameMode
+        public GameModeName StartGameMode
         {
             get
             {
@@ -47,7 +46,7 @@ namespace GameplayFramework
             DontDestroyOnLoad(gameObject);
             gameObject.name = "GameplayFramework";
 
-            Game game = CreateNewGame();
+            CreateNewGame();
 
             // Create Anchor.
             {
@@ -55,33 +54,32 @@ namespace GameplayFramework
                 anchorGo.hideFlags = HideFlags.HideInHierarchy;
                 anchorGo.transform.parent = gameObject.transform;
                 Anchor anchor = anchorGo.AddComponent<Anchor>();
-                anchor.Game = game;
             }
 
-            StartGame(game);
+            StartGame();
         }
 
 
 
-        protected virtual Game CreateNewGame()
+        protected virtual void CreateNewGame()
         {
-            return Game.CreateNew<Game>();
+            Game.StartNew<Game>();
         }
 
 
 
-        protected virtual void StartGame(Game game)
+        protected virtual void StartGame()
         {
             // Initialize Game.
             Game.ScenePreLoad += (sender, e) => OnScenePreLoad();
             Game.ScenePostLoad += (sender, e) => OnScenePostLoad();
-            Game.LoadScene(StartScene);
+            Game.Current.LoadScene(StartScene);
         }
         
         private void OnScenePreLoad()
         {
             Game.ScenePreLoad -= (sender, e) => OnScenePreLoad();
-            Game.SetGameMode(StartGameMode);
+            Game.Current.SetGameMode(StartGameMode);
         }
         
         private void OnScenePostLoad()

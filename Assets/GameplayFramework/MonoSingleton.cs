@@ -10,7 +10,17 @@ namespace GameplayFramework
 
 
 
-        public MonoSingleton()
+        protected MonoSingleton Instance
+        {
+            get
+            {
+                return _instance;
+            }
+        }
+
+
+
+        private void Awake()
         {
             lock(_instanceLock)
             {

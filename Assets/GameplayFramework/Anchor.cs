@@ -1,21 +1,23 @@
-﻿namespace GameplayFramework
+﻿using UnityEngine;
+
+namespace GameplayFramework
 {
     public class Anchor : MonoSingleton
     {
-        public Game Game
-        {
-            get;
-            set;
-        }
-
         protected virtual void Update()
         {
-            Game.OnUnityUpdate();
+            Game.Current.OnUnityUpdate();
         }
 
         protected virtual void FixedUpdate()
         {
-            Game.OnUnityFixedUpdate();
+            Game.Current.OnUnityFixedUpdate();
+        }
+
+        protected virtual void OnDestroy()
+        {
+            Debug.Log("here");
+            Game.Current.Destroy();
         }
     }
 }
