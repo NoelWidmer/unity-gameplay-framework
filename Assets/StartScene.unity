@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startScene: 0
-  _startGameMode: 1
+  _startGameMode: 0
 --- !u!4 &1054319341
 Transform:
   m_ObjectHideFlags: 0
