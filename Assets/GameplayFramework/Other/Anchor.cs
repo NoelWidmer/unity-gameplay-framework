@@ -13,11 +13,5 @@ namespace GameplayFramework
         {
             Game.Current.OnUnityFixedUpdate();
         }
-
-        protected virtual void OnDestroy()
-        {
-            Debug.Log("here");
-            Game.Current.Destroy();
-        }
     }
 }

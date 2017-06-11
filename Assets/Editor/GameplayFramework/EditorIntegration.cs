@@ -10,27 +10,27 @@ namespace GameplayFramework.Editor
     public class EditorIntegration : EditorWindow
     {
         private static readonly string _relativeEnumDirectory = "GameplayFramework" + Path.DirectorySeparatorChar + "Enums";
-        private static readonly string[] _sceneNamesToIgnore = new[] { "Start" };
+        private static readonly string[] _sceneNamesToIgnore = new[] { "StartScene" };
         private static readonly string _assetDirectoryName = "Assets";
 
         private static readonly string _sceneNamesEnumRelativeFilePath = _relativeEnumDirectory + Path.DirectorySeparatorChar + "SceneName.cs";
         private static readonly string _sceneNamesEnumTemplate =
             "namespace GameplayFramework" + "\n" +
             "{{" + "\n\t" +
-            "public enum SceneName" + "\n\t" +
-            "{{" + "\n\t\t" +
-            "{0}" + "\n\t" +
-            "}}" + "\n" +
+                "public enum SceneName" + "\n\t" +
+                "{{" + "\n\t\t" +
+                    "{0}" + "\n\t" +
+                "}}" + "\n" +
             "}}";
 
         private static readonly string _gameModeNamesEnumRelativeFilePath = _relativeEnumDirectory + Path.DirectorySeparatorChar + "GameModeName.cs";
         private static readonly string _gameModeNamesEnumTemplate =
             "namespace GameplayFramework" + "\n" +
             "{{" + "\n\t" +
-            "public enum GameModeName" + "\n\t" +
-            "{{" + "\n\t\t" +
-            "{0}" + "\n\t" +
-            "}}" + "\n" +
+                "public enum GameModeName" + "\n\t" +
+                "{{" + "\n\t\t" +
+                    "{0}" + "\n\t" +
+                "}}" + "\n" +
             "}}";
 
 
@@ -66,11 +66,11 @@ namespace GameplayFramework.Editor
 
             if(scenes == null || scenes.Length == 0)
             {
-                Debug.LogWarning("No scenes have been added to the build settings. The GameplayFramework cannot correctly rebuild.");
+                Log("No scenes have been added to the build settings. The GameplayFramework cannot correctly rebuild.");
                 return;
             }
 
-            List<string> sceneNames = new List<string>();
+            var sceneNames = new List<string>();
 
             // Get all scenes to add to the enum.
             foreach(var scene in scenes)
@@ -84,19 +84,16 @@ namespace GameplayFramework.Editor
                     throw new InvalidOperationException("Could not rebuild the scenes because there are multiple scenes with the same name (" + sceneName + ").");
 
                 sceneNames.Add(sceneName);
+                Log("Registering scene: " + sceneName);
             }
 
             string memberContent;
 
             // Build the contents of the enum file.
             if(sceneNames.Count == 0)
-            {
                 memberContent = string.Empty;
-            }
             else
-            {
                 memberContent = string.Join(",\n\t\t", sceneNames.ToArray());
-            }
 
             // Make sure the enum file exists.
             string fullEnumFilePath = Path.Combine(assetDirectory, _sceneNamesEnumRelativeFilePath);

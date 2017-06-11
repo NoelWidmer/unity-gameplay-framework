@@ -63,7 +63,8 @@ namespace GameplayFramework
 
         protected virtual void CreateNewGame()
         {
-            Game.StartNew<Game>();
+            Debug.Log("Create new game.");
+            Game.Current = new Game();
         }
 
 
@@ -71,20 +72,11 @@ namespace GameplayFramework
         protected virtual void StartGame()
         {
             // Initialize Game.
-            Game.ScenePreLoad += (sender, e) => OnScenePreLoad();
-            Game.ScenePostLoad += (sender, e) => OnScenePostLoad();
-            Game.Current.LoadScene(StartScene);
-        }
-        
-        private void OnScenePreLoad()
-        {
-            Game.ScenePreLoad -= (sender, e) => OnScenePreLoad();
+            Debug.Log("Start game.");
+
             Game.Current.SetGameMode(StartGameMode);
-        }
-        
-        private void OnScenePostLoad()
-        {
-            Game.ScenePostLoad -= (sender2, e2) => OnScenePostLoad();
+            Game.Current.LoadScene(StartScene);
+
             Destroy(this);
         }
     }

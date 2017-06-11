@@ -9,40 +9,23 @@ namespace GameplayFramework
 {
     public class Game
     {
-        #region Singleton
-
-        private static readonly object _createLock = new object();
-        private static Game _instance;
-
-
-
+        private static Game _current;
         public static Game Current
         {
             get
             {
-                return _instance;
+                return _current;
             }
-        }
-
-
-
-        public static void StartNew<T>() where T : Game, new()
-        {
-            T game = new T();
-
-            lock(_createLock)
+            set
             {
-                if(_instance != null)
-                    throw new InvalidOperationException("Only a single '" + typeof(Game).Name + "' can be started.");
+                _current = value;
 
-                _instance = game;
+                TickWatch.Start();
+                TickFixedWatch.Start();
             }
-
-            TickWatch.Start();            
-            TickFixedWatch.Start();
         }
 
-        #endregion
+
 
         #region Time
 
@@ -182,17 +165,11 @@ namespace GameplayFramework
                 IEnumerable<Type> matchingTypes = types.Where(t => t.Name == gameModeName);
 
                 if(matchingTypes.Count() == 1)
-                {
                     type = matchingTypes.First();
-                }
                 else if(matchingTypes.Count() == 0)
-                {
                     throw new InvalidOperationException("Couldn't find a type with name '" + gameModeName + "'.");
-                }
                 else
-                {
                     throw new InvalidOperationException("Found multiple types with name '" + gameModeName + "'.");
-                }
             }
 
             object instance;
@@ -212,13 +189,9 @@ namespace GameplayFramework
 
             // Make sure the instance is a game mode.
             if(instance is GameMode)
-            {
-                _instance.SetGameMode((GameMode)instance);
-            }
+                _current.SetGameMode((GameMode)instance);
             else
-            {
                 throw new InvalidOperationException("The type with name '" + gameModeName + "' is not a '" + typeof(GameMode).Name + "'.");
-            }
         }
 
         public virtual void SetGameMode<T>() where T : GameMode, new()
@@ -233,6 +206,7 @@ namespace GameplayFramework
             {
                 GameMode oldMode = GameMode;
 
+                Debug.Log("Setting game mode: " + mode.GetType().Name);
                 GameMode = mode;
 
                 if(oldMode != null)
@@ -254,22 +228,27 @@ namespace GameplayFramework
 
         #region Scene Loading
 
-        private static readonly object _sceneLock = new object();
-        private static AsyncOperation _sceneLoader;
+        public event EventHandler ScenePreLoad;
+        public event EventHandler SceneLoadBegin;
+        public event EventHandler ScenePostLoad;
 
-        public static event EventHandler ScenePreLoad;
-        public static event EventHandler SceneLoadBegin;
-        public static event EventHandler ScenePostLoad;
+
+
+        private readonly object _sceneLock = new object();
+        private AsyncOperation _sceneLoader;
+
+
 
         public virtual void LoadScene(SceneName scene)
         {
+            Debug.Log("Loading scene: " + scene.ToString());
+
             lock(_sceneLock)
             {
                 if(_sceneLoader != null)
                     throw new InvalidOperationException("Only a single scene can be loaded at a time.");
 
-                string sceneName = Enum.GetName(typeof(SceneName), scene);
-                Debug.Log(_instance.GetType().Name + " is about to load a scene: " + sceneName);
+                string sceneName = scene.ToString();
 
                 var preLoadScene = ScenePreLoad;
                 if(preLoadScene != null)
@@ -290,6 +269,8 @@ namespace GameplayFramework
             // Check scene loading
             AsyncOperation sceneLoader = _sceneLoader;
 
+            Debug.Log("Check scene loading process.");
+
             if(sceneLoader != null && sceneLoader.isDone)
             {
                 lock(_sceneLock)
@@ -304,12 +285,5 @@ namespace GameplayFramework
         }
 
         #endregion
-
-
-
-        public void Destroy()
-        {
-            _instance = null;
-        }
     }
 }

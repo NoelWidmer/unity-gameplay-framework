@@ -7,6 +7,7 @@ namespace GameplayFramework
     {
         private static readonly object _instanceLock = new object();
         private static MonoSingleton _instance;
+        private static int _gameId;
 
 
 
@@ -24,7 +25,7 @@ namespace GameplayFramework
         {
             lock(_instanceLock)
             {
-                if(_instance != null)
+                if(_instance != null && _gameId == Game.Current.GetHashCode())
                     throw new InvalidOperationException("The '" + GetType().Name + "' can only be instanciated once.");
 
                 _instance = this;
