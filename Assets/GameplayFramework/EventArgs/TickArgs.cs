@@ -8,21 +8,11 @@ namespace GameplayFramework
 
     public class TickArgs : EventArgs
     {
-        private readonly float _deltaTime;
+        public readonly float DeltaTime;
 
         public TickArgs(float deltaTime)
         {
-            _deltaTime = deltaTime;
-        }
-
-
-
-        public float DeltaTime
-        {
-            get
-            {
-                return _deltaTime;
-            }
+            DeltaTime = deltaTime;
         }
     }
 }

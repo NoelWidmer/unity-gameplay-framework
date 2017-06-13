@@ -50,6 +50,8 @@ namespace GameplayFramework
             Debug.Log("About to create a new game.");
             Game.CreateNewGame(game);
 
+            gameObject.AddComponent<GameInspector>();
+
             // Create Anchor.
             {
                 var anchorGo = new GameObject("Anchor");
