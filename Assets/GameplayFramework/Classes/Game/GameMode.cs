@@ -1,39 +1,43 @@
-﻿using System;
-using UnityEngine;
-
-namespace GameplayFramework
+﻿namespace GameplayFramework
 {
-    public class GameMode : IDisposable
+    public class GameMode
     {
         public GameMode()
         {
             Game.TickGameMode += Tick;
         }
 
+
+
         public virtual void BeginMode()
         {
-            Debug.Log("GameMode.BeginMode");
-            SetGameState();
+            Game.Current.GameState = GetGameState();
         }
 
 
 
-        protected virtual void SetGameState()
+        public virtual void BeforeEndMode()
         {
-            Game.GameState = new GameState();
+        }
+
+
+
+        public virtual void EndMode()
+        {
+            Game.TickGameMode -= Tick;
+        }
+
+
+
+        protected virtual GameState GetGameState()
+        {
+            return new GameState();
         }
 
 
 
         protected virtual void Tick(TickArgs e)
         {
-        }
-
-
-
-        public virtual void Dispose()
-        {
-            Game.TickGameMode -= Tick;
         }
     }
 }

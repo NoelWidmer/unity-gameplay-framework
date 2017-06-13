@@ -4,12 +4,12 @@
     {
         protected sealed override void AddTickHandler(TickHandler handler)
         {
-            Game.TickPlayerInput += handler;
+            Game.TickPlayerInputManagers += handler;
         }
 
         protected sealed override void RemoveTickHandler(TickHandler handler)
         {
-            Game.TickPlayerInput -= handler;
+            Game.TickPlayerInputManagers -= handler;
         }
 
 

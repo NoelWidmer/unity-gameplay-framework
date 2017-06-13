@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace GameplayFramework
+﻿namespace GameplayFramework
 {
     public class Anchor : MonoSingleton
     {

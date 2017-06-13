@@ -46,7 +46,9 @@ namespace GameplayFramework
             DontDestroyOnLoad(gameObject);
             gameObject.name = "GameplayFramework";
 
-            CreateNewGame();
+            Game game = GetNewGame();
+            Debug.Log("About to create a new game.");
+            Game.CreateNewGame(game);
 
             // Create Anchor.
             {
@@ -56,28 +58,25 @@ namespace GameplayFramework
                 Anchor anchor = anchorGo.AddComponent<Anchor>();
             }
 
+            Debug.Log("About to start the game.");
             StartGame();
+
+            Destroy(this);
         }
 
 
 
-        protected virtual void CreateNewGame()
+        protected virtual Game GetNewGame()
         {
-            Debug.Log("Create new game.");
-            Game.Current = new Game();
+            return new Game();
         }
 
 
 
         protected virtual void StartGame()
         {
-            // Initialize Game.
-            Debug.Log("Start game.");
-
             Game.Current.SetGameMode(StartGameMode);
             Game.Current.LoadScene(StartScene);
-
-            Destroy(this);
         }
     }
 }
