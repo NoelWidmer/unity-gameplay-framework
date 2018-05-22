@@ -23,7 +23,7 @@ namespace InspectorReflector.Implementation
         public static object DrawByte(MemberInfoAndInspectAttr memberInfo, object value)
         {
             int newValue;
-            if(memberInfo.InspectAttribute is InspectAsByteSliderAttribute)
+            if (memberInfo.InspectAttribute is InspectAsByteSliderAttribute)
             {
                 var attr = (InspectAsByteSliderAttribute)memberInfo.InspectAttribute;
 
@@ -36,9 +36,9 @@ namespace InspectorReflector.Implementation
             {
                 newValue = EditorGUILayout.IntField(memberInfo.Info.Name, (byte)value);
 
-                if(newValue < byte.MinValue)
+                if (newValue < byte.MinValue)
                     return byte.MinValue;
-                else if(newValue > byte.MaxValue)
+                else if (newValue > byte.MaxValue)
                     return byte.MaxValue;
             }
 
@@ -59,7 +59,7 @@ namespace InspectorReflector.Implementation
             char oldValue = (char)value;
             string newValue = EditorGUILayout.TextField(memberInfo.Info.Name, string.Empty + oldValue);
 
-            if(newValue == null || newValue == string.Empty)
+            if (newValue == null || newValue == string.Empty)
                 return default(char);
 
             return char.Parse(newValue.Substring(0, 1));
@@ -76,7 +76,7 @@ namespace InspectorReflector.Implementation
 
         public static object DrawDouble(MemberInfoAndInspectAttr memberInfo, object value)
         {
-            if(memberInfo.InspectAttribute is InspectAsFloatSliderAttribute)
+            if (memberInfo.InspectAttribute is InspectAsFloatSliderAttribute)
             {
                 var attr = (InspectAsFloatSliderAttribute)memberInfo.InspectAttribute;
 
@@ -91,7 +91,7 @@ namespace InspectorReflector.Implementation
             }
             else
             {
-                switch(memberInfo.InspectAttribute.InspectionType)
+                switch (memberInfo.InspectAttribute.InspectionType)
                 {
                     case InspectionType.DelayedDouble:
                         return EditorGUILayout.DelayedDoubleField(memberInfo.Info.Name, (double)value);
@@ -118,13 +118,13 @@ namespace InspectorReflector.Implementation
         {
             var flagAttrs = memberInfo.RealType.GetCustomAttributes(typeof(FlagsAttribute), false);
 
-            if(flagAttrs == null || flagAttrs.Length == 0)
+            if (flagAttrs == null || flagAttrs.Length == 0)
             {
                 return EditorGUILayout.EnumPopup(memberInfo.Info.Name, (Enum)value);
             }
-            else if(flagAttrs.Length == 1)
+            else if (flagAttrs.Length == 1)
             {
-                return EditorGUILayout.EnumMaskField(memberInfo.Info.Name, (Enum)value);
+                return EditorGUILayout.EnumFlagsField(memberInfo.Info.Name, (Enum)value);
             }
             else
             {
@@ -148,7 +148,7 @@ namespace InspectorReflector.Implementation
 
         public static object DrawFloat(MemberInfoAndInspectAttr memberInfo, object value)
         {
-            if(memberInfo.InspectAttribute is InspectAsFloatSliderAttribute)
+            if (memberInfo.InspectAttribute is InspectAsFloatSliderAttribute)
             {
                 var attr = (InspectAsFloatSliderAttribute)memberInfo.InspectAttribute;
 
@@ -160,7 +160,7 @@ namespace InspectorReflector.Implementation
             }
             else
             {
-                switch(memberInfo.InspectAttribute.InspectionType)
+                switch (memberInfo.InspectAttribute.InspectionType)
                 {
                     case InspectionType.DelayedFloat:
                         return EditorGUILayout.DelayedFloatField(memberInfo.Info.Name, (float)value);
@@ -174,7 +174,7 @@ namespace InspectorReflector.Implementation
 
         public static object DrawInt(MemberInfoAndInspectAttr memberInfo, object value)
         {
-            if(memberInfo.InspectAttribute is InspectAsIntSliderAttribute)
+            if (memberInfo.InspectAttribute is InspectAsIntSliderAttribute)
             {
                 var attr = (InspectAsIntSliderAttribute)memberInfo.InspectAttribute;
 
@@ -186,7 +186,7 @@ namespace InspectorReflector.Implementation
             }
             else
             {
-                switch(memberInfo.InspectAttribute.InspectionType)
+                switch (memberInfo.InspectAttribute.InspectionType)
                 {
                     case InspectionType.DelayedInt:
                         return EditorGUILayout.DelayedIntField(memberInfo.Info.Name, (int)value);
@@ -215,7 +215,7 @@ namespace InspectorReflector.Implementation
         public static object DrawSByte(MemberInfoAndInspectAttr memberInfo, object value)
         {
             int newValue;
-            if(memberInfo.InspectAttribute is InspectAsSByteSliderAttribute)
+            if (memberInfo.InspectAttribute is InspectAsSByteSliderAttribute)
             {
                 var attr = (InspectAsSByteSliderAttribute)memberInfo.InspectAttribute;
 
@@ -228,9 +228,9 @@ namespace InspectorReflector.Implementation
             {
                 newValue = EditorGUILayout.IntField(memberInfo.Info.Name, (sbyte)value);
 
-                if(newValue < sbyte.MinValue)
+                if (newValue < sbyte.MinValue)
                     return sbyte.MinValue;
-                else if(newValue > sbyte.MaxValue)
+                else if (newValue > sbyte.MaxValue)
                     return sbyte.MaxValue;
             }
 
@@ -242,7 +242,7 @@ namespace InspectorReflector.Implementation
         public static object DrawShort(MemberInfoAndInspectAttr memberInfo, object value)
         {
             int newValue;
-            if(memberInfo.InspectAttribute is InspectAsShortSliderAttribute)
+            if (memberInfo.InspectAttribute is InspectAsShortSliderAttribute)
             {
                 var attr = (InspectAsShortSliderAttribute)memberInfo.InspectAttribute;
 
@@ -253,11 +253,11 @@ namespace InspectorReflector.Implementation
             }
             else
             {
-                 newValue = EditorGUILayout.IntField(memberInfo.Info.Name, (short)value);
+                newValue = EditorGUILayout.IntField(memberInfo.Info.Name, (short)value);
 
-                if(newValue < short.MinValue)
+                if (newValue < short.MinValue)
                     return short.MinValue;
-                else if(newValue > short.MaxValue)
+                else if (newValue > short.MaxValue)
                     return short.MaxValue;
             }
 
@@ -268,7 +268,7 @@ namespace InspectorReflector.Implementation
 
         public static object DrawString(MemberInfoAndInspectAttr memberInfo, object value)
         {
-            switch(memberInfo.InspectAttribute.InspectionType)
+            switch (memberInfo.InspectAttribute.InspectionType)
             {
                 case InspectionType.DelayedString:
                     return EditorGUILayout.DelayedTextField(memberInfo.Info.Name, (string)value);
@@ -293,9 +293,9 @@ namespace InspectorReflector.Implementation
         {
             long newValue = EditorGUILayout.LongField(memberInfo.Info.Name, (uint)value);
 
-            if(newValue < uint.MinValue)
+            if (newValue < uint.MinValue)
                 return uint.MinValue;
-            else if(newValue > uint.MaxValue)
+            else if (newValue > uint.MaxValue)
                 return uint.MaxValue;
 
             return (uint)newValue;
@@ -308,13 +308,13 @@ namespace InspectorReflector.Implementation
             ulong oldValue = (ulong)value;
             string newValue = EditorGUILayout.TextField(memberInfo.Info.Name, string.Empty + oldValue);
 
-            if(newValue == null || newValue == string.Empty)
+            if (newValue == null || newValue == string.Empty)
                 return default(ulong);
 
             ulong result;
-            if(ulong.TryParse(newValue, out result))
+            if (ulong.TryParse(newValue, out result))
                 return result;
-            
+
             return oldValue;
         }
 
@@ -323,7 +323,7 @@ namespace InspectorReflector.Implementation
         public static object DrawUShort(MemberInfoAndInspectAttr memberInfo, object value)
         {
             int newValue;
-            if(memberInfo.InspectAttribute is InspectAsUShortSliderAttribute)
+            if (memberInfo.InspectAttribute is InspectAsUShortSliderAttribute)
             {
                 var attr = (InspectAsUShortSliderAttribute)memberInfo.InspectAttribute;
 
@@ -336,9 +336,9 @@ namespace InspectorReflector.Implementation
             {
                 newValue = EditorGUILayout.IntField(memberInfo.Info.Name, (ushort)value);
 
-                if(newValue < ushort.MinValue)
+                if (newValue < ushort.MinValue)
                     return ushort.MinValue;
-                else if(newValue > ushort.MaxValue)
+                else if (newValue > ushort.MaxValue)
                     return ushort.MaxValue;
             }
 

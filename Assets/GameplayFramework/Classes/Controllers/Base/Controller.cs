@@ -12,7 +12,7 @@ namespace GameplayFramework
 
 
         private IPawn _pawn;
-        
+
         public IPawn Pawn
         {
             get
@@ -36,19 +36,19 @@ namespace GameplayFramework
 
         public virtual void Possess(IPawn pawn)
         {
-            if(pawn == null)
+            if (pawn == null)
                 throw new ArgumentNullException("pawn");
 
-            lock(_possessionLock)
+            lock (_possessionLock)
             {
-                if(_pawn != null)
+                if (_pawn != null)
                     UnPossess();
 
                 _pawn = pawn;
                 pawn.OnBecamePossessed(this);
 
                 EventHandler possessedPawn = PossessedPawn;
-                if(possessedPawn != null)
+                if (possessedPawn != null)
                     possessedPawn(this, EventArgs.Empty);
             }
         }
@@ -57,15 +57,15 @@ namespace GameplayFramework
 
         public virtual void UnPossess()
         {
-            lock(_possessionLock)
+            lock (_possessionLock)
             {
-                if(_pawn == null)
+                if (_pawn == null)
                     return;
 
                 _pawn = null;
 
                 EventHandler unPossessedPawn = UnPossessedPawn;
-                if(unPossessedPawn != null)
+                if (unPossessedPawn != null)
                     unPossessedPawn(this, EventArgs.Empty);
             }
         }
@@ -83,10 +83,10 @@ namespace GameplayFramework
             }
             set
             {
-                if(value == _tickEnabled)
+                if (value == _tickEnabled)
                     return;
 
-                if(value)
+                if (value)
                     Game.TickControllers += Tick;
                 else
                     Game.TickControllers -= Tick;

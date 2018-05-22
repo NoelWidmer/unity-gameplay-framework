@@ -23,9 +23,9 @@ namespace GameplayFramework
 
         private void Awake()
         {
-            lock(_instanceLock)
+            lock (_instanceLock)
             {
-                if(_instance != null && _gameId == Game.Current.GetHashCode())
+                if (_instance != null && _gameId == Game.Current.GetHashCode())
                     throw new InvalidOperationException("The '" + GetType().Name + "' can only be instanciated once.");
 
                 _instance = this;
