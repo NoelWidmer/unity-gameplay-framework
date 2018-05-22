@@ -23,7 +23,7 @@ public class Waypoint : MonoBehaviour, IWaypoint
     {
         List<WaypointSign> result = new List<WaypointSign>();
 
-        foreach(var waypointSign in WaypointSigns)
+        foreach (var waypointSign in WaypointSigns)
         {
             float angle = waypointSign.GetAngle();
 
@@ -35,11 +35,11 @@ public class Waypoint : MonoBehaviour, IWaypoint
             float cXb = Vector2.Dot(direction, b);
             float cXa = Vector2.Dot(direction, a);
 
-            if(aXb * aXc >= 0f && cXb * cXa >= 0f && angle <= 180f)
+            if (aXb * aXc >= 0f && cXb * cXa >= 0f && angle <= 180f)
                 result.Add(waypointSign);
         }
 
-        if(result.Count == 1)
+        if (result.Count == 1)
         {
             waypoint = result[0].Waypoint;
             return false;
@@ -55,7 +55,7 @@ public class Waypoint : MonoBehaviour, IWaypoint
 
     public void DrawSignHandles()
     {
-        foreach(var waypointSign in WaypointSigns)
+        foreach (var waypointSign in WaypointSigns)
         {
             waypointSign.DrawHandles(this);
         }

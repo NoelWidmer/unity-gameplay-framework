@@ -18,20 +18,20 @@ namespace InspectorReflector.Implementation
 
             IRDrawer drawer = new IRDrawer();
 
-            if(drawer.SupportsIRInspection(obj))
+            if (drawer.SupportsIRInspection(obj))
             {
-                if(obj == null)
+                if (obj == null)
                 {
                     _lastTarget = null;
                     return;
                 }
 
-                if(_lastTarget == null)
+                if (_lastTarget == null)
                 {
                     _lastTarget = obj;
                     // Set transient data to null.
                 }
-                else if(_lastTarget.Equals(obj) == false)
+                else if (_lastTarget.Equals(obj) == false)
                 {
                     // Create new transient data.
                 }

@@ -61,7 +61,7 @@ public class WaypointSign
         float angle = Vector2.Angle(ToConstraint, FromConstraint);
 
         Vector2 tmp = Quaternion.Euler(0, 0, 90f) * FromConstraint;
-        if(Vector3.Dot(tmp.normalized, ToConstraint.normalized) < 0f)
+        if (Vector3.Dot(tmp.normalized, ToConstraint.normalized) < 0f)
             angle = 180f + (180f - angle);
 
         return angle;

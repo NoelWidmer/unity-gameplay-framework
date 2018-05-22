@@ -22,7 +22,7 @@ namespace GameplayFramework
 
         public static void CreateNewGame(Game game)
         {
-            if(game == null)
+            if (game == null)
                 throw new ArgumentNullException("game");
 
             game.TickWatch.Start();
@@ -31,7 +31,7 @@ namespace GameplayFramework
             _current = game;
         }
 
-        
+
 
         protected readonly System.Diagnostics.Stopwatch TickWatch = new System.Diagnostics.Stopwatch();
         protected readonly System.Diagnostics.Stopwatch TickFixedWatch = new System.Diagnostics.Stopwatch();
@@ -49,7 +49,7 @@ namespace GameplayFramework
             CheckLoadSceneCompletion();
         }
 
-        
+
 
         #region Tick Events
 
@@ -57,7 +57,7 @@ namespace GameplayFramework
         {
             float deltaTime = TickWatch.Elapsed.Milliseconds / 1000f;
             TickWatch.Reset();
-            
+
             TickArgs tickArgs = new TickArgs(deltaTime);
             PlayTime += deltaTime;
 
@@ -106,7 +106,7 @@ namespace GameplayFramework
                     Where(t => t.Name == gameModeName).
                     ToList();
 
-                switch(matchingTypes.Count)
+                switch (matchingTypes.Count)
                 {
                     case 0:
                         throw new InvalidOperationException("Couldn't find a type with name '" + gameModeName + "'.");
@@ -125,16 +125,16 @@ namespace GameplayFramework
             {
                 instance = Activator.CreateInstance(type);
 
-                if(instance == null)
+                if (instance == null)
                     throw new InvalidOperationException("Couldn't create an instance of the type with name '" + gameModeName + "'.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new InvalidOperationException("Couldn't create an instance of the type with name '" + gameModeName + "'.", ex);
             }
 
             // Make sure the instance is a game mode.
-            if(instance is GameMode)
+            if (instance is GameMode)
                 _current.SetGameMode((GameMode)instance);
             else
                 throw new InvalidOperationException("The type with name '" + gameModeName + "' is not a '" + typeof(GameMode).Name + "'.");
@@ -148,18 +148,18 @@ namespace GameplayFramework
 
         protected virtual void SetGameMode(GameMode mode)
         {
-            lock(_gameModeLock)
+            lock (_gameModeLock)
             {
                 GameMode oldMode = GameMode;
 
-                if(oldMode != null)
+                if (oldMode != null)
                     oldMode.BeforeEndMode();
-                
+
                 Debug.Log("Setting game mode: " + mode.GetType().Name);
                 GameMode = mode;
                 mode.BeginMode();
 
-                if(oldMode != null)
+                if (oldMode != null)
                     oldMode.EndMode();
             }
         }
@@ -185,9 +185,9 @@ namespace GameplayFramework
         {
             Debug.Log("Loading scene: " + scene.ToString());
 
-            lock(_sceneLock)
+            lock (_sceneLock)
             {
-                if(_sceneLoader != null)
+                if (_sceneLoader != null)
                     throw new InvalidOperationException("Only a single scene can be loaded at a time.");
 
                 string sceneName = scene.ToString();
@@ -206,9 +206,9 @@ namespace GameplayFramework
 
             Debug.Log("Check scene loading process.");
 
-            if(sceneLoader != null && sceneLoader.isDone)
+            if (sceneLoader != null && sceneLoader.isDone)
             {
-                lock(_sceneLock)
+                lock (_sceneLock)
                 {
                     _sceneLoader = null;
                     RaiseScenePostLoad(EventArgs.Empty);
@@ -224,7 +224,7 @@ namespace GameplayFramework
         protected virtual void RaiseTickPlayerInputManagers(TickArgs e)
         {
             var tickInput = TickPlayerInputManagers;
-            if(tickInput != null)
+            if (tickInput != null)
                 tickInput(e);
         }
 
@@ -232,7 +232,7 @@ namespace GameplayFramework
         protected virtual void RaiseTickControllers(TickArgs e)
         {
             var tickControl = TickControllers;
-            if(tickControl != null)
+            if (tickControl != null)
                 tickControl(e);
         }
 
@@ -240,7 +240,7 @@ namespace GameplayFramework
         protected virtual void RaiseTickActors(TickArgs e)
         {
             var tickActor = TickActors;
-            if(tickActor != null)
+            if (tickActor != null)
                 tickActor(e);
         }
 
@@ -248,7 +248,7 @@ namespace GameplayFramework
         protected virtual void RaiseTickPlayerCameraManagers(TickArgs e)
         {
             var tickCamera = TickPlayerCameraManagers;
-            if(tickCamera != null)
+            if (tickCamera != null)
                 tickCamera(e);
         }
 
@@ -256,7 +256,7 @@ namespace GameplayFramework
         protected virtual void RaiseTickPlayerHUDManagers(TickArgs e)
         {
             var tickHUD = TickPlayerHUDManagers;
-            if(tickHUD != null)
+            if (tickHUD != null)
                 tickHUD(e);
         }
 
@@ -264,7 +264,7 @@ namespace GameplayFramework
         protected virtual void RaiseTickGameMode(TickArgs e)
         {
             var tickMode = TickGameMode;
-            if(tickMode != null)
+            if (tickMode != null)
                 tickMode(e);
         }
 
@@ -272,7 +272,7 @@ namespace GameplayFramework
         protected virtual void RaiseTickFixed(TickArgs e)
         {
             var tickFixed = TickFixed;
-            if(tickFixed != null)
+            if (tickFixed != null)
                 tickFixed(e);
         }
 
@@ -282,15 +282,15 @@ namespace GameplayFramework
         protected void RaiseScenePreLoad(EventArgs e)
         {
             var scenePreLoad = ScenePreLoad;
-            if(scenePreLoad != null)
+            if (scenePreLoad != null)
                 scenePreLoad(Game.Current, e);
         }
-        
+
         public event EventHandler ScenePostLoad;
         protected void RaiseScenePostLoad(EventArgs e)
         {
             var scenePostLoad = ScenePostLoad;
-            if(scenePostLoad != null)
+            if (scenePostLoad != null)
                 scenePostLoad(Game.Current, e);
         }
 

@@ -40,14 +40,14 @@ namespace GameplayFramework
         /// <param name="controller">The controller that took possession of this pawn.</param>
         public virtual void OnBecamePossessed(Controller controller)
         {
-            if(controller == null)
+            if (controller == null)
                 throw new ArgumentNullException("controller");
 
-            lock(_lock)
+            lock (_lock)
             {
-                if(_controller != null)
+                if (_controller != null)
                 {
-                    if(_controller.Equals(controller))
+                    if (_controller.Equals(controller))
                         return;
 
                     _controller.UnPossess();
@@ -57,7 +57,7 @@ namespace GameplayFramework
                 controller.UnPossessedPawn += (sender, e) => OnBecameUnPossessed();
 
                 EventHandler becamePossessed = BecamePossessed;
-                if(becamePossessed != null)
+                if (becamePossessed != null)
                     becamePossessed(this, EventArgs.Empty);
             }
         }
@@ -68,15 +68,15 @@ namespace GameplayFramework
 
         public virtual void Dispose()
         {
-            lock(_lock)
+            lock (_lock)
             {
-                if(_controller != null)
+                if (_controller != null)
                     _controller.UnPossess();
             }
         }
 
         #endregion
-        
+
 
 
         /// <summary>
@@ -84,16 +84,16 @@ namespace GameplayFramework
         /// </summary>
         protected virtual void OnBecameUnPossessed()
         {
-            lock(_lock)
+            lock (_lock)
             {
-                if(_controller == null)
+                if (_controller == null)
                     return;
-                
+
                 _controller.UnPossessedPawn -= (sender, e) => OnBecameUnPossessed();
                 _controller = null;
 
                 EventHandler becameUnossessed = BecameUnPossessed;
-                if(becameUnossessed != null)
+                if (becameUnossessed != null)
                     becameUnossessed(this, EventArgs.Empty);
             }
         }
