@@ -1,3 +1,5 @@
+:warning: **This repository is no longer maintained.**
+
 # Unity3D Gameplay Framework
 
 <!--http://doctoc.herokuapp.com/-->
