@@ -1,4 +1,4 @@
-:warning: **This repository is no longer maintained.**
+:warning: **This repository is no longer maintained. It no longer reflects my views on good software design.**
 
 # Unity3D Gameplay Framework
 
